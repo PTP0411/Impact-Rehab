@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Comparison Demo - Impact Rehab</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    th {
+      background-color: #7ab92f;
+      color: white;
+    }
+    .improved { background-color: #d4edda; } /* light green */
+    .declined { background-color: #f8d7da; } /* light red */
+    .no-change { background-color: #fff; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Session Comparison Demo</h1>
+  </header>
+
+  <main class="compare-container">
+    <h2>Patient: John Doe</h2>
+
+    <label for="session-select">Select previous session:</label>
+    <select id="session-select">
+      <option value="session1">2025-06-15</option>
+      <option value="session2">2025-03-20</option>
+    </select>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Test</th>
+          <th>Previous Score</th>
+          <th>Current Score</th>
+        </tr>
+      </thead>
+      <tbody id="comparison-body">
+        <!-- Rows will be populated by JS -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    const tests = [
+      "Standing posture", "Neck flexion", "Shoulder flexion", "Grip strength"
+    ];
+
+    const sessionData = {
+      session1: { "Standing posture":7, "Neck flexion":6, "Shoulder flexion":8, "Grip strength":30 },
+      session2: { "Standing posture":6, "Neck flexion":7, "Shoulder flexion":7, "Grip strength":28 },
+      current:  { "Standing posture":8, "Neck flexion":7, "Shoulder flexion":9, "Grip strength":35 }
+    };
+
+    function populateTable(prevSession) {
+      const tbody = document.getElementById("comparison-body");
+      tbody.innerHTML = ""; // clear
+
+      tests.forEach(test => {
+        const prev = sessionData[prevSession][test];
+        const curr = sessionData["current"][test];
+
+        let status = "no-change";
+        if (curr > prev) status = "improved";
+        else if (curr < prev) status = "declined";
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${test}</td>
+          <td>${prev}</td>
+          <td class="${status}">${curr}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Initial load
+    populateTable("session1");
+
+    // Dropdown change
+    document.getElementById("session-select").addEventListener("change", function() {
+      populateTable(this.value);
+    });
+  </script>
+</body>
+</html>

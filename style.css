@@ -1,0 +1,410 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f9f9f9;
+  color: #333;
+}
+
+header {
+  background: #7ab92f;
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+main {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+form {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+h2 {
+  margin-top: 1.5rem;
+  color: #7ab92f;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+input[type="number"] {
+  width: 70px;
+  padding: 0.3rem;
+  margin-left: 0.5rem;
+}
+
+button {
+  background: #7ab92f;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+button:hover {
+  background: #5d8e24;
+}
+
+#results {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+#doctor-login {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: black;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#doctor-login:hover {
+  background: #333;
+}
+
+/* Login Page */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.login-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  max-width: 400px;
+  width: 100%;
+}
+
+.login-form h2 {
+  color: #7ab92f;
+  margin-bottom: 1rem;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.login-form button {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.signup-text {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+.signup-text a {
+  color: #7ab92f;
+  text-decoration: none;
+  font-weight: bold;
+}
+.signup-text a:hover {
+  text-decoration: underline;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.back-link a {
+  color: #7ab92f;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+/* Dashboard */
+.dashboard-container {
+  padding: 2rem;
+}
+
+.patients-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.patient-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+
+.patient-card:hover {
+  transform: translateY(-5px);
+}
+
+.patient-card h3 {
+  margin-bottom: 0.5rem;
+  color: #7ab92f;
+}
+
+.header-buttons {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+#add-patient-btn {
+  background: #7ab92f;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#add-patient-btn:hover {
+  background: #5d8e24;
+}
+
+#logout-btn {
+  background: black;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#logout-btn:hover {
+  background: #333;
+}
+
+/* new patients */
+/* Form container card */
+.form-container {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.form-container:hover {
+  transform: translateY(-3px);
+}
+
+/* Form header */
+.patient-form h2 {
+  color: #7ab92f;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Form groups for spacing */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Inputs & select styling */
+.patient-form input,
+.patient-form select,
+.patient-form textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.patient-form input:focus,
+.patient-form select:focus,
+.patient-form textarea:focus {
+  outline: none;
+  border-color: #7ab92f;
+  box-shadow: 0 0 5px rgba(122, 185, 47, 0.5);
+}
+
+/* Save button */
+.patient-form button {
+  width: 100%;
+  padding: 0.9rem;
+  background: #7ab92f;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.patient-form button:hover {
+  background: #5d8e24;
+  transform: translateY(-2px);
+}
+
+/* Back button */
+#back-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: black;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#back-btn:hover {
+  background: #333;
+}
+
+/* patient's  page */
+.patient-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.patient-info {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.patient-info h2 {
+  color: #7ab92f;
+  margin-bottom: 0.5rem;
+}
+
+.patient-info p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.patient-info label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.patient-info select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+/* Chart section */
+.chart-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+/*Visit*/
+.visit-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.visit-info {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.visit-info h2 { color: #7ab92f; }
+.visit-info p { margin: 0.5rem 0; }
+
+.visit-scores {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.visit-scores table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.visit-scores th, .visit-scores td {
+  padding: 0.8rem;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.visit-scores th {
+  background: #7ab92f;
+  color: white;
+  border-radius: 6px 6px 0 0;
+}
+
+.overall-score-chart {
+  max-width: 300px; /* scale down width */
+  margin: 1rem auto; /* center the chart */
+}
+
