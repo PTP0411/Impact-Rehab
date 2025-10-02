@@ -1,50 +1,66 @@
 document.getElementById("sandbox-form").addEventListener("submit", function(e) {
   e.preventDefault();
 
-  // Collect all inputs
   const formData = new FormData(e.target);
-  const scores = [];
-  const labels = [];
+  let totalScore = 0;
+  let count = 0;
 
-  formData.forEach((value, key) => {
-    labels.push(key);
-    scores.push(Number(value) || 0);
-  });
-
-  // Destroy old chart if exists
-  if (window.resultsChart) {
-    window.resultsChart.destroy();
+  for (let [key, value] of formData.entries()) {
+    if (value !== "" && !isNaN(value)) {
+      totalScore += parseFloat(value);
+      count++;
+    }
   }
 
-  // Create chart
-  const ctx = document.getElementById("resultsChart").getContext("2d");
-  window.resultsChart = new Chart(ctx, {
-    type: "radar",
+  // Calculate normalized final score
+  let finalScore = count > 0 ? (totalScore / count).toFixed(2) : 0;
+
+  // Clear previous chart if exists
+  const chartContainer = document.getElementById("resultsChart");
+  if (Chart.getChart(chartContainer)) {
+    Chart.getChart(chartContainer).destroy();
+  }
+
+  // Display as a pie chart: score vs remaining
+  const ctx = chartContainer.getContext("2d");
+  new Chart(ctx, {
+    type: "pie",
     data: {
-      labels: labels,
+      labels: ["Score"],
       datasets: [{
-        label: "Your Scores",
-        data: scores,
-        backgroundColor: "rgba(0, 74, 173, 0.2)",
-        borderColor: "#004aad",
-        borderWidth: 2,
-        pointBackgroundColor: "#004aad"
+        data: [finalScore, 100 - finalScore],
+        backgroundColor: ["#7ab92f", "rgba(0,0,0,0.1)"],
+        borderColor: ["#7ab92f", "#ccc"],
+        borderWidth: 1
       }]
     },
     options: {
       responsive: true,
-      scales: {
-        r: {
-          angleLines: { color: "#ccc" },
-          suggestedMin: 0,
-          suggestedMax: 100
+      plugins: {
+        legend: {
+          position: "bottom"
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `${context.label}: ${context.parsed}%`;
+            }
+          }
         }
       }
     }
   });
+
+  // Also show numeric score
+  const existingScore = document.getElementById("numeric-score");
+  if (existingScore) existingScore.remove();
+  document.getElementById("results").insertAdjacentHTML(
+    "beforeend",
+    `<p id="numeric-score"><strong>Final Score:</strong> ${finalScore}</p>`
+  );
 });
 
-document.getElementById("doctor-login").addEventListener("click", () => {
-  window.location.href = "login.html";
+//
+document.getElementById("doctor-login").addEventListener("click", function() {
+  window.location.href = "login.html"; // or the path to your doctor login page
 });
-
