@@ -62,5 +62,5 @@ document.getElementById("sandbox-form").addEventListener("submit", function(e) {
 
 //
 document.getElementById("doctor-login").addEventListener("click", function() {
-  window.location.href = "login.html"; // or the path to your doctor login page
+  window.location.href = "login.php"; 
 });
