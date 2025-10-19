@@ -1,30 +1,24 @@
 <?php
- session_start();
- if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
+session_start();
+if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
     header('Location: login.php');
     exit();
 }
 
 include_once("db_connect.php");
+include_once("iftisa_util.php");
 
 // Get patient info from URL parameter
 $patient_id = isset($_GET['pid']) ? intval($_GET['pid']) : 1;
 
-// Fetch patient information
-$query = "SELECT u.first_name, u.last_name, u.dob 
-          FROM patients p 
-          JOIN users u ON p.pid = u.uid 
-          WHERE p.pid = :pid";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':pid', $patient_id, PDO::PARAM_INT);
-$stmt->execute();
-$patient = $stmt->fetch();
+// Fetch patient information using utility function
+$patient = getPatientInfo($db, $patient_id);
 
 if (!$patient) {
     die("Patient not found");
 }
 
-$patient_name = $patient['first_name'] . ' ' . $patient['last_name'];
+$patient_name = formatPatientName($patient);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -161,344 +155,216 @@ $patient_name = $patient['first_name'] . ' ' . $patient['last_name'];
         
         <!-- HumanTrak Section -->
         <div class="form-section">
-          <h3> HumanTrak Assessment</h3>
+          <h3>🏃 HumanTrak Assessment</h3>
           <div class="test-grid">
-            <div class="test-item">
-              <label for="ex1">Standing Posture</label>
-              <select name="scores[1]" id="ex1" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Ideal alignment</option>
-                <option value="4">4 - Minor forward head/pelvic tilt</option>
-                <option value="3">3 - Moderate misalignment</option>
-                <option value="2">2 - Compensatory postures</option>
-                <option value="1">1 - Severe asymmetry</option>
-                <option value="0">0 - Visible dysfunction</option>
-              </select>
-            </div>
+            <?php
+            // HumanTrak exercises
+            $humanTrakTests = [
+                ['ex1', 'Standing Posture', [
+                    5 => '5 - Ideal alignment',
+                    4 => '4 - Minor forward head/pelvic tilt',
+                    3 => '3 - Moderate misalignment',
+                    2 => '2 - Compensatory postures',
+                    1 => '1 - Severe asymmetry',
+                    0 => '0 - Visible dysfunction'
+                ]],
+                ['ex2', 'Neck Flexion', [
+                    5 => '5 - ≥50° pain-free',
+                    4 => '4 - 40-49° w/ slight stiffness',
+                    3 => '3 - 30-39° or mild pain',
+                    2 => '2 - <30°',
+                    1 => '1 - Unable or painful',
+                    0 => '0 - Unable or painful'
+                ]],
+                ['ex3', 'Neck Lateral Flexion', [
+                    5 => '5 - ≥50° pain-free',
+                    4 => '4 - 40-49° w/ slight stiffness',
+                    3 => '3 - 30-39° or mild pain',
+                    2 => '2 - <30°',
+                    1 => '1 - Unable or painful',
+                    0 => '0 - Unable or painful'
+                ]],
+                ['ex4', 'Neck Rotation', [
+                    5 => '5 - ≥80° bilaterally',
+                    4 => '4 - 70-79°',
+                    3 => '3 - 60-69°',
+                    2 => '2 - 45-59°',
+                    1 => '1 - <45° or painful',
+                    0 => '0 - <45° or painful'
+                ]],
+                ['ex5', 'Shoulder Flexion', [
+                    5 => '5 - ≥170° bilaterally',
+                    4 => '4 - 155-169°',
+                    3 => '3 - 140-154°',
+                    2 => '2 - 120-139°',
+                    1 => '1 - <120° or pain',
+                    0 => '0 - <120° or pain'
+                ]],
+                ['ex6', 'Shoulder ER @ 90° Abd', [
+                    5 => '5 - ≥90° both arms',
+                    4 => '4 - 80-89°',
+                    3 => '3 - 70-79°',
+                    2 => '2 - 60-69° or asymmetry >10°',
+                    1 => '1 - <60° or pain',
+                    0 => '0 - <60° or pain'
+                ]],
+                ['ex7', 'Shoulder IR @ 90° Abd', [
+                    5 => '5 - ≥90° both arms',
+                    4 => '4 - 80-89°',
+                    3 => '3 - 70-79°',
+                    2 => '2 - 60-69° or asymmetry >10°',
+                    1 => '1 - <60° or pain',
+                    0 => '0 - <60° or pain'
+                ]],
+                ['ex8', 'Trunk Flexion', [
+                    5 => '5 - Fingers to floor',
+                    4 => '4 - Touch shins',
+                    3 => '3 - Below knees',
+                    2 => '2 - Mid-thigh',
+                    1 => '1 - Above thigh or pain',
+                    0 => '0 - Above thigh or pain'
+                ]],
+                ['ex9', 'Trunk Lateral Flexion', [
+                    5 => '5 - Fingertips to mid shin',
+                    4 => '4 - Knee',
+                    3 => '3 - Mid-thigh',
+                    2 => '2 - Upper-thigh',
+                    1 => '1 - Asymmetry or pain',
+                    0 => '0 - Asymmetry or pain'
+                ]],
+                ['ex10', 'Trunk Rotation', [
+                    5 => '5 - ≥50° each side',
+                    4 => '4 - 45-49°',
+                    3 => '3 - 35-44°',
+                    2 => '2 - 25-34°',
+                    1 => '1 - <25° or painful',
+                    0 => '0 - <25° or painful'
+                ]],
+                ['ex11', 'Trunk Extension', [
+                    5 => '5 - Full spinal extension',
+                    4 => '4 - Moderate motion',
+                    3 => '3 - Mild pain',
+                    2 => '2 - Limited/painful',
+                    1 => '1 - Limited/painful',
+                    0 => '0 - Unable'
+                ]],
+                ['ex12', 'Overhead Squat', [
+                    5 => '5 - Dowel overhead, full depth',
+                    4 => '4 - Minor compensation',
+                    3 => '3 - Shallow depth or valgus',
+                    2 => '2 - Major compensation',
+                    1 => '1 - Unable or painful',
+                    0 => '0 - Unable or painful'
+                ]],
+                ['ex13', 'Lunge', [
+                    5 => '5 - Stable, full range',
+                    4 => '4 - Mild waver',
+                    3 => '3 - Step instability or asymmetry',
+                    2 => '2 - Depth limited',
+                    1 => '1 - Loss of balance or pain',
+                    0 => '0 - Loss of balance or pain'
+                ]],
+                ['ex14', 'Squat', [
+                    5 => '5 - Full depth, neutral spine',
+                    4 => '4 - Slight forward lean',
+                    3 => '3 - Asymmetry or shallow',
+                    2 => '2 - Compensation or pain',
+                    1 => '1 - Incomplete',
+                    0 => '0 - Incomplete'
+                ]],
+                ['ex15', 'Seated Hip ER', [
+                    5 => '5 - ≥45° both hips + <10° asymmetry',
+                    4 => '4 - 40-44°',
+                    3 => '3 - 30-39°',
+                    2 => '2 - <30° or asymmetry >15°',
+                    1 => '1 - Pain or block',
+                    0 => '0 - Pain or block'
+                ]],
+                ['ex16', 'Seated Hip IR', [
+                    5 => '5 - ≥45° both hips + <10° asymmetry',
+                    4 => '4 - 40-44°',
+                    3 => '3 - 30-39°',
+                    2 => '2 - <30° or asymmetry >15°',
+                    1 => '1 - Pain or block',
+                    0 => '0 - Pain or block'
+                ]]
+            ];
 
-            <div class="test-item">
-              <label for="ex2">Neck Flexion</label>
-              <select name="scores[2]" id="ex2" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥50° pain-free</option>
-                <option value="4">4 - 40-49° w/ slight stiffness</option>
-                <option value="3">3 - 30-39° or mild pain</option>
-                <option value="2">2 - <30°</option>
-                <option value="1">1 - Unable or painful</option>
-                <option value="0">0 - Unable or painful</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex3">Neck Lateral Flexion</label>
-              <select name="scores[3]" id="ex3" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥50° pain-free</option>
-                <option value="4">4 - 40-49° w/ slight stiffness</option>
-                <option value="3">3 - 30-39° or mild pain</option>
-                <option value="2">2 - <30°</option>
-                <option value="1">1 - Unable or painful</option>
-                <option value="0">0 - Unable or painful</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex4">Neck Rotation</label>
-              <select name="scores[4]" id="ex4" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥80° bilaterally</option>
-                <option value="4">4 - 70-79°</option>
-                <option value="3">3 - 60-69°</option>
-                <option value="2">2 - 45-59°</option>
-                <option value="1">1 - <45° or painful</option>
-                <option value="0">0 - <45° or painful</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex5">Shoulder Flexion</label>
-              <select name="scores[5]" id="ex5" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥170° bilaterally</option>
-                <option value="4">4 - 155-169°</option>
-                <option value="3">3 - 140-154°</option>
-                <option value="2">2 - 120-139°</option>
-                <option value="1">1 - <120° or pain</option>
-                <option value="0">0 - <120° or pain</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex6">Shoulder ER @ 90° Abd</label>
-              <select name="scores[6]" id="ex6" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥90° both arms</option>
-                <option value="4">4 - 80-89°</option>
-                <option value="3">3 - 70-79°</option>
-                <option value="2">2 - 60-69° or asymmetry >10°</option>
-                <option value="1">1 - <60° or pain</option>
-                <option value="0">0 - <60° or pain</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex7">Shoulder IR @ 90° Abd</label>
-              <select name="scores[7]" id="ex7" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥90° both arms</option>
-                <option value="4">4 - 80-89°</option>
-                <option value="3">3 - 70-79°</option>
-                <option value="2">2 - 60-69° or asymmetry >10°</option>
-                <option value="1">1 - <60° or pain</option>
-                <option value="0">0 - <60° or pain</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex8">Trunk Flexion</label>
-              <select name="scores[8]" id="ex8" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Fingers to floor</option>
-                <option value="4">4 - Touch shins</option>
-                <option value="3">3 - Below knees</option>
-                <option value="2">2 - Mid-thigh</option>
-                <option value="1">1 - Above thigh or pain</option>
-                <option value="0">0 - Above thigh or pain</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex9">Trunk Lateral Flexion</label>
-              <select name="scores[9]" id="ex9" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Fingertips to mid shin</option>
-                <option value="4">4 - Knee</option>
-                <option value="3">3 - Mid-thigh</option>
-                <option value="2">2 - Upper-thigh</option>
-                <option value="1">1 - Asymmetry or pain</option>
-                <option value="0">0 - Asymmetry or pain</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex10">Trunk Rotation</label>
-              <select name="scores[10]" id="ex10" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥50° each side</option>
-                <option value="4">4 - 45-49°</option>
-                <option value="3">3 - 35-44°</option>
-                <option value="2">2 - 25-34°</option>
-                <option value="1">1 - <25° or painful</option>
-                <option value="0">0 - <25° or painful</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex11">Trunk Extension</label>
-              <select name="scores[11]" id="ex11" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Full spinal extension</option>
-                <option value="4">4 - Moderate motion</option>
-                <option value="3">3 - Mild pain</option>
-                <option value="2">2 - Limited/painful</option>
-                <option value="1">1 - Limited/painful</option>
-                <option value="0">0 - Unable</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex12">Overhead Squat</label>
-              <select name="scores[12]" id="ex12" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Dowel overhead, full depth</option>
-                <option value="4">4 - Minor compensation</option>
-                <option value="3">3 - Shallow depth or valgus</option>
-                <option value="2">2 - Major compensation</option>
-                <option value="1">1 - Unable or painful</option>
-                <option value="0">0 - Unable or painful</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex13">Lunge</label>
-              <select name="scores[13]" id="ex13" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Stable, full range</option>
-                <option value="4">4 - Mild waver</option>
-                <option value="3">3 - Step instability or asymmetry</option>
-                <option value="2">2 - Depth limited</option>
-                <option value="1">1 - Loss of balance or pain</option>
-                <option value="0">0 - Loss of balance or pain</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex14">Squat</label>
-              <select name="scores[14]" id="ex14" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Full depth, neutral spine</option>
-                <option value="4">4 - Slight forward lean</option>
-                <option value="3">3 - Asymmetry or shallow</option>
-                <option value="2">2 - Compensation or pain</option>
-                <option value="1">1 - Incomplete</option>
-                <option value="0">0 - Incomplete</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex15">Seated Hip ER</label>
-              <select name="scores[15]" id="ex15" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥45° both hips + <10° asymmetry</option>
-                <option value="4">4 - 40-44°</option>
-                <option value="3">3 - 30-39°</option>
-                <option value="2">2 - <30° or asymmetry >15°</option>
-                <option value="1">1 - Pain or block</option>
-                <option value="0">0 - Pain or block</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex16">Seated Hip IR</label>
-              <select name="scores[16]" id="ex16" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥45° both hips + <10° asymmetry</option>
-                <option value="4">4 - 40-44°</option>
-                <option value="3">3 - 30-39°</option>
-                <option value="2">2 - <30° or asymmetry >15°</option>
-                <option value="1">1 - Pain or block</option>
-                <option value="0">0 - Pain or block</option>
-              </select>
-            </div>
+            foreach ($humanTrakTests as $test) {
+                echo generateTestItem($test[0], $test[1], $test[2]);
+            }
+            ?>
           </div>
         </div>
 
         <!-- Dynamo Section -->
         <div class="form-section">
-          <h3> Dynamo Assessment</h3>
+          <h3>💪 Dynamo Assessment</h3>
           <div class="test-grid">
-            <div class="test-item">
-              <label for="ex17">Grip Strength</label>
-              <select name="scores[17]" id="ex17" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - 90-100th percentile</option>
-                <option value="4">4 - 70-89th percentile</option>
-                <option value="3">3 - 50-69th percentile</option>
-                <option value="2">2 - 30-49th percentile</option>
-                <option value="1">1 - 0-29th percentile</option>
-                <option value="0">0 - Unable/pain limited</option>
-              </select>
-            </div>
+            <?php
+            echo generateTestItem('ex17', 'Grip Strength', [
+                5 => '5 - 90-100th percentile',
+                4 => '4 - 70-89th percentile',
+                3 => '3 - 50-69th percentile',
+                2 => '2 - 30-49th percentile',
+                1 => '1 - 0-29th percentile',
+                0 => '0 - Unable/pain limited'
+            ]);
+            ?>
           </div>
         </div>
 
         <!-- ForceDecks Section -->
         <div class="form-section">
-          <h3> ForceDecks Assessment</h3>
+          <h3>⚡ ForceDecks Assessment</h3>
           <div class="test-grid">
-            <div class="test-item">
-              <label for="ex18">Quiet Stand EO</label>
-              <select name="scores[18]" id="ex18" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Excellent</option>
-                <option value="4">4 - Good</option>
-                <option value="3">3 - Fair</option>
-                <option value="2">2 - Poor</option>
-                <option value="1">1 - Very Poor</option>
-                <option value="0">0 - Unable</option>
-              </select>
-            </div>
+            <?php
+            $forceDecksTests = [
+                ['ex18', 'Quiet Stand EO', [
+                    5 => '5 - Excellent', 4 => '4 - Good', 3 => '3 - Fair',
+                    2 => '2 - Poor', 1 => '1 - Very Poor', 0 => '0 - Unable'
+                ]],
+                ['ex19', 'Quiet Stand EC', [
+                    5 => '5 - Excellent', 4 => '4 - Good', 3 => '3 - Fair',
+                    2 => '2 - Poor', 1 => '1 - Very Poor', 0 => '0 - Unable'
+                ]],
+                ['ex20', 'SLS EO', [
+                    5 => '5 - Excellent', 4 => '4 - Good', 3 => '3 - Fair',
+                    2 => '2 - Poor', 1 => '1 - Very Poor', 0 => '0 - Unable'
+                ]],
+                ['ex21', 'SLS EC', [
+                    5 => '5 - Excellent', 4 => '4 - Good', 3 => '3 - Fair',
+                    2 => '2 - Poor', 1 => '1 - Very Poor', 0 => '0 - Unable'
+                ]],
+                ['ex22', 'CMJ', [
+                    5 => '5 - 90-100th percentile', 4 => '4 - 70-89th percentile',
+                    3 => '3 - 50-69th percentile', 2 => '2 - 30-49th percentile',
+                    1 => '1 - 0-29th percentile', 0 => '0 - Unable/pain limited'
+                ]],
+                ['ex23', 'SQJ', [
+                    5 => '5 - 90-100th percentile', 4 => '4 - 70-89th percentile',
+                    3 => '3 - 50-69th percentile', 2 => '2 - 30-49th percentile',
+                    1 => '1 - 0-29th percentile', 0 => '0 - Unable/pain limited'
+                ]],
+                ['ex24', 'SL Jump', [
+                    5 => '5 - Symmetry >90%, high output',
+                    4 => '4 - Symmetry 80-89%',
+                    3 => '3 - 70-79% or moderate output',
+                    2 => '2 - <70% or unstable',
+                    1 => '1 - Fall or pain',
+                    0 => '0 - Fall or pain'
+                ]],
+                ['ex25', 'IMTP', [
+                    5 => '5 - ≥4.0× BW', 4 => '4 - 3.0-3.9× BW',
+                    3 => '3 - 2.5-2.9× BW', 2 => '2 - 2.0-2.4× BW',
+                    1 => '1 - <2.0× or poor form', 0 => '0 - <2.0× or poor form'
+                ]]
+            ];
 
-            <div class="test-item">
-              <label for="ex19">Quiet Stand EC</label>
-              <select name="scores[19]" id="ex19" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Excellent</option>
-                <option value="4">4 - Good</option>
-                <option value="3">3 - Fair</option>
-                <option value="2">2 - Poor</option>
-                <option value="1">1 - Very Poor</option>
-                <option value="0">0 - Unable</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex20">SLS EO</label>
-              <select name="scores[20]" id="ex20" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Excellent</option>
-                <option value="4">4 - Good</option>
-                <option value="3">3 - Fair</option>
-                <option value="2">2 - Poor</option>
-                <option value="1">1 - Very Poor</option>
-                <option value="0">0 - Unable</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex21">SLS EC</label>
-              <select name="scores[21]" id="ex21" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Excellent</option>
-                <option value="4">4 - Good</option>
-                <option value="3">3 - Fair</option>
-                <option value="2">2 - Poor</option>
-                <option value="1">1 - Very Poor</option>
-                <option value="0">0 - Unable</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex22">CMJ</label>
-              <select name="scores[22]" id="ex22" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - 90-100th percentile</option>
-                <option value="4">4 - 70-89th percentile</option>
-                <option value="3">3 - 50-69th percentile</option>
-                <option value="2">2 - 30-49th percentile</option>
-                <option value="1">1 - 0-29th percentile</option>
-                <option value="0">0 - Unable/pain limited</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex23">SQJ</label>
-              <select name="scores[23]" id="ex23" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - 90-100th percentile</option>
-                <option value="4">4 - 70-89th percentile</option>
-                <option value="3">3 - 50-69th percentile</option>
-                <option value="2">2 - 30-49th percentile</option>
-                <option value="1">1 - 0-29th percentile</option>
-                <option value="0">0 - Unable/pain limited</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex24">SL Jump</label>
-              <select name="scores[24]" id="ex24" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - Symmetry >90%, high output</option>
-                <option value="4">4 - Symmetry 80-89%</option>
-                <option value="3">3 - 70-79% or moderate output</option>
-                <option value="2">2 - <70% or unstable</option>
-                <option value="1">1 - Fall or pain</option>
-                <option value="0">0 - Fall or pain</option>
-              </select>
-            </div>
-
-            <div class="test-item">
-              <label for="ex25">IMTP</label>
-              <select name="scores[25]" id="ex25" required>
-                <option value="">Select Score</option>
-                <option value="5">5 - ≥4.0× BW</option>
-                <option value="4">4 - 3.0-3.9× BW</option>
-                <option value="3">3 - 2.5-2.9× BW</option>
-                <option value="2">2 - 2.0-2.4× BW</option>
-                <option value="1">1 - <2.0× or poor form</option>
-                <option value="0">0 - <2.0× or poor form</option>
-              </select>
-            </div>
+            foreach ($forceDecksTests as $test) {
+                echo generateTestItem($test[0], $test[1], $test[2]);
+            }
+            ?>
           </div>
         </div>
 

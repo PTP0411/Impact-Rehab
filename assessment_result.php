@@ -1,61 +1,39 @@
 <?php
-    session_start();
-    if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
+session_start();
+if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
     header('Location: login.php');
     exit();
-    }
+}
 
 include_once("db_connect.php");
+include_once("iftisa_util.php");
 
 $session_id = isset($_GET['sid']) ? intval($_GET['sid']) : 0;
 
-// Fetch session data with patient info
-$query = "SELECT s.*, u.first_name, u.last_name, u.dob 
-          FROM sessions s 
-          JOIN patients p ON s.pid = p.pid 
-          JOIN users u ON p.pid = u.uid 
-          WHERE s.sid = :sid";
-
-$stmt = $db->prepare($query);
-$stmt->bindParam(':sid', $session_id, PDO::PARAM_INT);
-$stmt->execute();
-$session = $stmt->fetch();
+// Fetch session data
+$session = getSessionData($db, $session_id);
 
 if (!$session) {
     die("Session not found");
 }
 
-$patient_name = $session['first_name'] . ' ' . $session['last_name'];
+// Extract data
+$patient_name = formatPatientName($session);
 $msk_score = round($session['msk_score'], 2);
-
-// Determine performance tier
-function getPerformanceTier($score) {
-    if ($score >= 90) return ["Elite", "0.1+", "#2e7d32"];
-    if ($score >= 80) return ["Competitive", "0-5", "#388e3c"];
-    if ($score >= 70) return ["Athletic", "6-10", "#66bb6a"];
-    if ($score >= 60) return ["Functional", "11-15", "#fbc02d"];
-    if ($score >= 50) return ["Recreational", "16-20", "#f57c00"];
-    return ["At Risk", "20+", "#d32f2f"];
-}
-
 list($tier, $handicap, $color) = getPerformanceTier($msk_score);
 
-// Fetch individual scores
-$scores_query = "SELECT e.name, sc.score 
-                 FROM scores sc 
-                 JOIN exercises e ON sc.eid = e.eid 
-                 WHERE sc.sid = :sid 
-                 ORDER BY e.eid";
+// Fetch and group scores
+$all_scores = getSessionScores($db, $session_id);
+$grouped_scores = groupScoresByCategory($all_scores);
 
-$scores_stmt = $db->prepare($scores_query);
-$scores_stmt->bindParam(':sid', $session_id, PDO::PARAM_INT);
-$scores_stmt->execute();
-$all_scores = $scores_stmt->fetchAll();
+$humanTrakScores = $grouped_scores['humanTrak'];
+$dynamoScores = $grouped_scores['dynamo'];
+$forceDecksScores = $grouped_scores['forceDecks'];
 
-// Group scores by category
-$humanTrakScores = array_slice($all_scores, 0, 16);
-$dynamoScores = array_slice($all_scores, 16, 1);
-$forceDecksScores = array_slice($all_scores, 17, 8);
+// Calculate category averages
+$humanTrakAvg = calculateCategoryAverage($humanTrakScores);
+$dynamoAvg = calculateCategoryAverage($dynamoScores);
+$forceDecksAvg = calculateCategoryAverage($forceDecksScores);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -237,9 +215,129 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
         gap: 1.5rem;
       }
     }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        margin: 0;
+        padding: 0;
+      }
+
+      header, .action-buttons {
+        display: none !important;
+      }
+
+      .results-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .patient-header {
+        background: #f0f0f0 !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        page-break-after: avoid;
+      }
+
+      .score-card, .scores-section {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+      }
+
+      .tier-badge {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .score-item {
+        page-break-inside: avoid;
+      }
+
+      .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #7ab92f;
+      }
+
+      .print-header h1 {
+        color: #7ab92f;
+        margin: 0;
+        font-size: 28px;
+      }
+
+      .print-header p {
+        margin: 5px 0;
+        color: #666;
+      }
+
+      .print-footer {
+        display: block !important;
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 15px;
+        border-top: 2px solid #ddd;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .category-summary {
+        display: block !important;
+        background: #f9f9f9;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 8px;
+        page-break-inside: avoid;
+      }
+
+      .category-summary h4 {
+        color: #7ab92f;
+        margin-top: 0;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .summary-item {
+        text-align: center;
+        padding: 10px;
+        background: white;
+        border-radius: 5px;
+      }
+
+      .summary-item .label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      .summary-item .value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #7ab92f;
+      }
+    }
+
+    .print-header, .print-footer, .category-summary {
+      display: none;
+    }
   </style>
 </head>
 <body>
+  <!-- Print-only header -->
+  <div class="print-header">
+    <h1>Impact Rehab - MSK Assessment Report</h1>
+    <p>Musculoskeletal Performance Evaluation</p>
+  </div>
+
   <header>
     <h1>MSK Assessment Results</h1>
     <button id="back-btn" onclick="window.location.href='doctor.php'">← Back to Dashboard</button>
@@ -257,7 +355,6 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
       <h2>MSK Performance Index</h2>
       
       <div class="score-content">
-        <!-- Chart with centered score -->
         <div class="chart-wrapper">
           <canvas id="scoreChart"></canvas>
           <div class="chart-center-text">
@@ -266,11 +363,29 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
           </div>
         </div>
         
-        <!-- Score information -->
         <div class="score-info">
           <div class="tier-badge"><?php echo $tier; ?></div>
           <p><strong>Golf Handicap Equivalent:</strong> <?php echo $handicap; ?></p>
           <p class="handicap">Assessment completed on <?php echo date('M d, Y', strtotime($session['session_date'])); ?></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Summary (print only) -->
+    <div class="category-summary">
+      <h4>Assessment Category Breakdown</h4>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="label">HumanTrak</div>
+          <div class="value"><?php echo $humanTrakAvg; ?>%</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">Dynamo</div>
+          <div class="value"><?php echo $dynamoAvg; ?>%</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">ForceDecks</div>
+          <div class="value"><?php echo $forceDecksAvg; ?>%</div>
         </div>
       </div>
     </div>
@@ -303,7 +418,7 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
 
     <!-- ForceDecks Scores -->
     <div class="scores-section">
-      <h3>⚡ ForceDecks Assessment</h3>
+      <h3> ForceDecks Assessment</h3>
       <div class="score-grid">
         <?php foreach ($forceDecksScores as $item): ?>
           <div class="score-item">
@@ -314,16 +429,22 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
       </div>
     </div>
 
+    <!-- Print-only footer -->
+    <div class="print-footer">
+      <p><strong>Impact Rehab</strong> | Musculoskeletal Performance Center</p>
+      <p>This report is confidential and intended for the patient and healthcare provider only.</p>
+      <p>Report generated on <?php echo date('F d, Y \a\t g:i A'); ?></p>
+    </div>
+
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Report</button>
-      <button class="btn btn-primary" onclick="window.location.href='assessment_form.php?pid=<?php echo $session['pid']; ?>'">➕ New Assessment</button>
-      <button class="btn btn-secondary" onclick="window.location.href='patient.php?pid=<?php echo $session['pid']; ?>'">👤 View Patient</button>
+      <button class="btn btn-secondary" onclick="window.print()"> Print Report</button>
+      <button class="btn btn-primary" onclick="window.location.href='assessment_form.php?pid=<?php echo $session['pid']; ?>'"> New Assessment</button>
+      <button class="btn btn-secondary" onclick="window.location.href='patient.php?pid=<?php echo $session['pid']; ?>'"> View Patient</button>
     </div>
   </main>
 
   <script>
-    // Create doughnut chart
     const ctx = document.getElementById('scoreChart').getContext('2d');
     const scoreChart = new Chart(ctx, {
       type: 'doughnut',
@@ -339,12 +460,8 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
         responsive: true,
         maintainAspectRatio: true,
         plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            enabled: false
-          }
+          legend: { display: false },
+          tooltip: { enabled: false }
         },
         cutout: '75%'
       }
