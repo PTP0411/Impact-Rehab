@@ -81,28 +81,70 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
       text-align: center;
     }
     
-    .score-display {
-      font-size: 4rem;
+    .score-card h2 {
+      color: #7ab92f;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    .score-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3rem;
+      margin: 1.5rem 0;
+    }
+    
+    .chart-wrapper {
+      position: relative;
+      width: 200px;
+      height: 200px;
+    }
+    
+    .chart-center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    .chart-center-text .score-number {
+      font-size: 2.5rem;
       font-weight: bold;
       color: <?php echo $color; ?>;
-      margin: 1rem 0;
+      line-height: 1;
+    }
+    
+    .chart-center-text .score-total {
+      font-size: 1rem;
+      color: #666;
+    }
+    
+    .score-info {
+      text-align: left;
     }
     
     .tier-badge {
       display: inline-block;
       background: <?php echo $color; ?>;
       color: white;
-      padding: 0.5rem 2rem;
-      border-radius: 25px;
-      font-size: 1.2rem;
+      padding: 0.5rem 1.5rem;
+      border-radius: 20px;
+      font-size: 1.1rem;
       font-weight: bold;
-      margin: 1rem 0;
+      margin-bottom: 0.5rem;
     }
     
-    .handicap {
-      font-size: 1.2rem;
+    .score-info p {
+      margin: 0.5rem 0;
+      color: #333;
+      font-size: 1rem;
+    }
+    
+    .score-info .handicap {
       color: #666;
-      margin-top: 0.5rem;
+      font-size: 0.95rem;
     }
     
     .scores-section {
@@ -148,17 +190,6 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
       font-size: 1.1rem;
     }
     
-    .chart-container {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
     .action-buttons {
       display: flex;
       gap: 1rem;
@@ -199,6 +230,13 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
       border-radius: 8px;
       margin-bottom: 2rem;
     }
+    
+    @media (max-width: 768px) {
+      .score-content {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -214,17 +252,27 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
       <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($session['session_time'])); ?></p>
     </div>
 
-    <!-- Overall Score Card -->
+    <!-- Overall Score Card with Chart -->
     <div class="score-card">
       <h2>MSK Performance Index</h2>
-      <div class="score-display"><?php echo $msk_score; ?>/100</div>
-      <div class="tier-badge"><?php echo $tier; ?></div>
-      <p class="handicap">Golf Handicap Equivalent: <?php echo $handicap; ?></p>
-    </div>
-
-    <!-- Chart -->
-    <div class="chart-container">
-      <canvas id="scoreChart"></canvas>
+      
+      <div class="score-content">
+        <!-- Chart with centered score -->
+        <div class="chart-wrapper">
+          <canvas id="scoreChart"></canvas>
+          <div class="chart-center-text">
+            <div class="score-number"><?php echo $msk_score; ?></div>
+            <div class="score-total">/100</div>
+          </div>
+        </div>
+        
+        <!-- Score information -->
+        <div class="score-info">
+          <div class="tier-badge"><?php echo $tier; ?></div>
+          <p><strong>Golf Handicap Equivalent:</strong> <?php echo $handicap; ?></p>
+          <p class="handicap">Assessment completed on <?php echo date('M d, Y', strtotime($session['session_date'])); ?></p>
+        </div>
+      </div>
     </div>
 
     <!-- HumanTrak Scores -->
@@ -283,25 +331,22 @@ $forceDecksScores = array_slice($all_scores, 17, 8);
         labels: ['Score', 'Remaining'],
         datasets: [{
           data: [<?php echo $msk_score; ?>, <?php echo 100 - $msk_score; ?>],
-          backgroundColor: ['<?php echo $color; ?>', '#e0e0e0'],
+          backgroundColor: ['<?php echo $color; ?>', '#e8e8e8'],
           borderWidth: 0
         }]
       },
       options: {
         responsive: true,
+        maintainAspectRatio: true,
         plugins: {
           legend: {
             display: false
           },
           tooltip: {
-            callbacks: {
-              label: function(context) {
-                return context.label + ': ' + context.parsed + '%';
-              }
-            }
+            enabled: false
           }
         },
-        cutout: '70%'
+        cutout: '75%'
       }
     });
   </script>
