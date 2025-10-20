@@ -57,7 +57,9 @@
 
     <section id="results">
       <h2>Your Results</h2>
-      <canvas id="resultsChart"></canvas>
+      <div class = "res-chart">
+        <canvas id="resultsChart"></canvas>
+      </div>
     </section>
   </main>
 

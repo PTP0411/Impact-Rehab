@@ -408,3 +408,7 @@ button:hover {
   margin: 1rem auto; /* center the chart */
 }
 
+.res-chart {
+  max-width: 300px; /* scale down width */
+  margin: 1rem auto; /* center the chart */
+}

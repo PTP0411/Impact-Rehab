@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once('db_connect.php');
+include_once('connect.php');
 include_once('philipUtil.php');
 
 
