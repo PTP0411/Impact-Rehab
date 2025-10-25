@@ -115,8 +115,9 @@ if ($admin) {
     <?php if ($admin): ?>
         <p><strong>Assigned Doctor:</strong> <?php echo $doctorName; ?></p>
         <button onclick="window.location.href='reassignPatient.php?pid=<?php echo $patient['pid']; ?>'">Reassign Patient</button>
+        <button onclick="window.location.href='editPatient.php?pid=<?php echo $patient['pid']; ?>'">Edit Patient Info</button>
     <?php endif; ?>
-
+<p></p>
      <!-- Overall Score Graph -->
      <section class="chart-section">
       <canvas id="scoreChart"></canvas>
@@ -134,59 +135,66 @@ if ($admin) {
   </main>
 
   
-
+  
   <script>
-    // Back button
-    document.getElementById("back-btn").addEventListener("click", () => {
-      window.location.href = "doctor.php";
-    });
+  // Back button
+  document.getElementById("back-btn").addEventListener("click", () => {
+    window.location.href = "doctor.php";
+  });
 
-    // Visit dropdown: redirect to visit.html with query string
-    document.getElementById("visit-select").addEventListener("change", function() {
-      const visitDate = this.value;
-      window.location.href = `visit.html?date=${visitDate}`;
-    });
+  // Visit dropdown
+  document.getElementById("visit-select").addEventListener("change", function() {
+    const visitDate = this.value;
+    if (visitDate) {
+      window.location.href = `visit.php?pid=<?php echo $pid; ?>&date=${visitDate}`;
+    }
+  });
 
-    // New session button (UI placeholder)
-    document.getElementById("new-session-btn").addEventListener("click", () => {
-      alert("Add new session form coming soon!");
-    });
+  // New session button
+  document.getElementById("new-session-btn").addEventListener("click", () => {
+    window.location.href = `newSession.php?pid=<?php echo $pid; ?>`;
+  });
 
-    // Demo Chart.js data
-    const ctx = document.getElementById("scoreChart").getContext("2d");
-    const scoreChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Mar', 'Jun', 'Sep'],
-        datasets: [{
-          label: 'Overall Score',
-          data: [65, 72, 78, 85],
-          fill: true,
-          backgroundColor: 'rgba(122, 185, 47, 0.2)',
-          borderColor: '#7ab92f',
-          borderWidth: 2,
-          tension: 0.3,
-          pointBackgroundColor: '#7ab92f'
-        }]
+  // Insert data
+  const sessionDates = <?php echo json_encode($sessionDates); ?>;
+  const scores = <?php echo json_encode($scores); ?>;
+
+  // Chart
+  const ctx = document.getElementById("scoreChart").getContext("2d");
+  const scoreChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sessionDates,
+      datasets: [{
+        label: 'MSK Score',
+        data: scores,
+        fill: true,
+        backgroundColor: 'rgba(122, 185, 47, 0.2)',
+        borderColor: '#7ab92f',
+        borderWidth: 2,
+        tension: 0.3,
+        pointBackgroundColor: '#7ab92f'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true },
+        tooltip: { mode: 'index', intersect: false }
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: true },
-          tooltip: { mode: 'index', intersect: false }
+      scales: {
+        y: {
+          suggestedMin: 0,
+          suggestedMax: 100,
+          title: { display: true, text: 'Score' }
         },
-        scales: {
-          y: {
-            suggestedMin: 0,
-            suggestedMax: 100,
-            title: { display: true, text: 'Score' }
-          },
-          x: {
-            title: { display: true, text: 'Visit Month' }
-          }
+        x: {
+          title: { display: true, text: 'Session Date' }
         }
       }
-    });
-  </script>
+    }
+  });
+</script>
+
 </body>
 </html>
