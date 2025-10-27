@@ -7,33 +7,30 @@ session_start();
 if (isset($_GET['logout'])) {
     session_unset();
     session_destroy();
-    header("Location: login.php");
+    header("Location: logout.php");
     exit();
 }
 
 include_once('connect.php');
 include_once('philipUtil.php');
 
-$hardcoded_did = 5;
-$_SESSION['uid'] = $hardcoded_did;
 
 // Ensure user is logged in
-if (!isset($_SESSION['uid'])) {
-    // header("Location: login.php");
-    // exit();
-    $_SESSION['uid'] = 5;
+if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
+  header('Location: login.php');
+  exit();
 }
-
+$uid = $_SESSION['uid'];
 // Fetch user info
 $stmt = $db->prepare("SELECT first_name, last_name FROM users WHERE uid = ?");
-$stmt->execute([$hardcoded_did]);
+$stmt->execute([$uid]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
 if (!$user) {
-  die("Doctor with did = 5 not found.");
+  die("Doctor with did = ($uid) not found.");
 }
 
-$uid = $_SESSION['uid'];
 
 // Check if current user is admin
 $admin = isAdmin($db, $uid);
