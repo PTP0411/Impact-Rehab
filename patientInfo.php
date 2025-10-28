@@ -70,7 +70,7 @@ if ($startDate && $endDate)
 {
     // Both start and end provided
     $stmt = $db->prepare("
-        SELECT session_date, msk_score 
+        SELECT sid, session_date, msk_score 
         FROM sessions 
         WHERE pid = ? AND session_date BETWEEN ? AND ? 
         ORDER BY session_date ASC
@@ -82,7 +82,7 @@ elseif ($startDate)
 {
     // Only start date provided
     $stmt = $db->prepare("
-        SELECT session_date, msk_score 
+        SELECT sid, session_date, msk_score 
         FROM sessions 
         WHERE pid = ? AND session_date >= ? 
         ORDER BY session_date ASC
@@ -93,7 +93,7 @@ elseif ($startDate)
 elseif ($endDate) {
     // Only end date provided
     $stmt = $db->prepare("
-        SELECT session_date, msk_score 
+        SELECT sid, session_date, msk_score 
         FROM sessions 
         WHERE pid = ? AND session_date <= ? 
         ORDER BY session_date ASC
