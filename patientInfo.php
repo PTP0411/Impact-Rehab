@@ -105,7 +105,7 @@ else
 {
     // No filters, get all sessions
     $stmt = $db->prepare("
-        SELECT session_date, msk_score 
+        SELECT sid, session_date, msk_score 
         FROM sessions 
         WHERE pid = ? 
         ORDER BY session_date ASC
@@ -211,13 +211,20 @@ if ($admin) {
      <!-- Overall Score Graph -->
      <section class="chart-section">
       <canvas id="scoreChart"></canvas>
-        </section>
+     </section>
+
+
+
+
       <label for="visit-select">Select Visit:</label>
       <select id="visit-select">
         <option value="">-- Select a Visit --</option>
-        <?php foreach (array_reverse($sessionDates) as $date): ?>
-            <option value="<?php echo $date; ?>"><?php echo $date; ?></option>
+        <?php foreach (array_reverse($sessions) as $session): ?>
+            <option value="<?php echo $session['sid']; ?>">
+                <?php echo htmlspecialchars($session['session_date']); ?>
+            </option>
         <?php endforeach; ?>
+
       </select>
         <button id="new-session-btn">+ New Session</button>
     </section>
@@ -234,9 +241,9 @@ if ($admin) {
 
   // Visit dropdown
   document.getElementById("visit-select").addEventListener("change", function() {
-    const visitDate = this.value;
-    if (visitDate) {
-      window.location.href = `visit.php?pid=<?php echo $pid; ?>&date=${visitDate}`;
+    const sid = this.value;
+    if (sid) {
+      window.location.href = `assessment_result.php?sid=${sid}`;
     }
   });
 
