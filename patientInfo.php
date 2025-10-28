@@ -63,9 +63,58 @@ if (!$patient) {
 
 
 // Fetch sessions for the current patient
-$stmt = $db->prepare("SELECT session_date, msk_score FROM sessions WHERE pid = ? ORDER BY session_date ASC");
-$stmt->execute([$pid]);
+$startDate = isset($_GET['start']) && $_GET['start'] !== '' ? $_GET['start'] : null;
+$endDate = isset($_GET['end']) && $_GET['end'] !== '' ? $_GET['end'] : null;
+
+if ($startDate && $endDate) 
+{
+    // Both start and end provided
+    $stmt = $db->prepare("
+        SELECT session_date, msk_score 
+        FROM sessions 
+        WHERE pid = ? AND session_date BETWEEN ? AND ? 
+        ORDER BY session_date ASC
+    ");
+    $stmt->execute([$pid, $startDate, $endDate]);
+
+} 
+elseif ($startDate) 
+{
+    // Only start date provided
+    $stmt = $db->prepare("
+        SELECT session_date, msk_score 
+        FROM sessions 
+        WHERE pid = ? AND session_date >= ? 
+        ORDER BY session_date ASC
+    ");
+    $stmt->execute([$pid, $startDate]);
+
+} 
+elseif ($endDate) {
+    // Only end date provided
+    $stmt = $db->prepare("
+        SELECT session_date, msk_score 
+        FROM sessions 
+        WHERE pid = ? AND session_date <= ? 
+        ORDER BY session_date ASC
+    ");
+    $stmt->execute([$pid, $endDate]);
+
+} 
+else 
+{
+    // No filters, get all sessions
+    $stmt = $db->prepare("
+        SELECT session_date, msk_score 
+        FROM sessions 
+        WHERE pid = ? 
+        ORDER BY session_date ASC
+    ");
+    $stmt->execute([$pid]);
+}
+
 $sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Prepare arrays for Chart.js
 $sessionDates = [];
@@ -109,12 +158,56 @@ if ($admin) {
     <section class="patient-info">
     <h2 id="patient-name"><?php echo htmlspecialchars($patient['name']); ?></h2>
     <p><strong>Date of Birth:</strong> <?php echo htmlspecialchars($patient['dob']); ?></p>
-    <?php if ($admin): ?>
-        <p><strong>Assigned Doctor:</strong> <?php echo $doctorName; ?></p>
-        <button onclick="window.location.href='reassignPatient.php?pid=<?php echo $patient['pid']; ?>'">Reassign Patient</button>
-        <button onclick="window.location.href='editPatient.php?pid=<?php echo $patient['pid']; ?>'">Edit Patient Info</button>
+    <p><strong>Assigned Doctor:</strong> <?php echo htmlspecialchars($doctorName); ?></p>
+      
+    
+
+    <!-- Patient Note -->
+    <?php if (!empty($patient['note'])): ?>
+        <h3>Patient Note</h3>
+        <p><?php echo nl2br(htmlspecialchars($patient['note'])); ?></p>
+
+    <?php else: ?>
+        <h3>Patient Note</h3>
+        <p><em>No notes available.</em></p>
     <?php endif; ?>
-<p></p>
+
+    <?php if ($admin): ?>
+      <button onclick="window.location.href='reassignPatient.php?pid=<?php echo $patient['pid']; ?>'">Reassign Patient</button>
+      <button onclick="window.location.href='editPatient.php?pid=<?php echo $patient['pid']; ?>'">Edit Patient Info</button>
+    <?php endif; ?>
+
+    </section>
+
+    <!-- Date range form -->
+    <form method="get" id="date-filter-form">
+      <input type="hidden" name="pid" value="<?php echo $pid; ?>">
+
+      <div class="date-fields">
+        <label for="start-date">Start Date:</label>
+        <input 
+          type="date" 
+          id="start-date" 
+          name="start" 
+          value="<?php echo isset($_GET['start']) ? htmlspecialchars($_GET['start']) : ''; ?>"
+        >
+
+        <label for="end-date">End Date:</label>
+        <input 
+          type="date" 
+          id="end-date" 
+          name="end" 
+          value="<?php echo isset($_GET['end']) ? htmlspecialchars($_GET['end']) : ''; ?>"
+        >
+      </div>
+
+      <div class="button-group">
+        <button type="submit">Filter</button>
+        <button type="button" onclick="clearSearch()">Clear</button>
+      </div>
+    </form>
+
+
      <!-- Overall Score Graph -->
      <section class="chart-section">
       <canvas id="scoreChart"></canvas>
@@ -122,7 +215,7 @@ if ($admin) {
       <label for="visit-select">Select Visit:</label>
       <select id="visit-select">
         <option value="">-- Select a Visit --</option>
-        <?php foreach ($sessionDates as $date): ?>
+        <?php foreach (array_reverse($sessionDates) as $date): ?>
             <option value="<?php echo $date; ?>"><?php echo $date; ?></option>
         <?php endforeach; ?>
       </select>
@@ -149,7 +242,7 @@ if ($admin) {
 
   // New session button
   document.getElementById("new-session-btn").addEventListener("click", () => {
-    window.location.href = `newSession.php?pid=<?php echo $pid; ?>`;
+    window.location.href = `assessment_form.php?pid=<?php echo $pid; ?>`;
   });
 
   // Insert data
@@ -192,6 +285,19 @@ if ($admin) {
     }
   });
 </script>
+
+<script>
+    function clearSearch() {
+    // Reset the form
+    const form = document.getElementById('date-filter-form');
+    form.reset();
+
+    // Reload the same page without query parameters (keep pid)
+    const pid = <?php echo json_encode($pid); ?>;
+    window.location.href = window.location.pathname + '?pid=' + pid;
+}
+    </script>
+
 
 </body>
 </html>
