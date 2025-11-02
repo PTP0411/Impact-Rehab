@@ -12,7 +12,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $patient_id = intval($_POST['patient_id']);
     $doctor_id = intval($_POST['doctor_id']);
-    $scores = $_POST['scores']; // Array of exercise scores
+    $scores = isset($_POST['scores']) ? $_POST['scores'] : [];
+    
+    // Filter out empty scores
+    $scores = array_filter($scores, function($value) {
+        return $value !== '' && $value !== null;
+    });
+    
+    // Check if at least one score is provided
+    if (count($scores) === 0) {
+        echo "Error: No test scores provided. Please complete at least one test.";
+        echo "<br><a href='assessment_form.php?pid=$patient_id'>Go Back</a>";
+        exit();
+    }
     
     // Save assessment using utility function
     $session_id = saveAssessment($db, $patient_id, $scores);
