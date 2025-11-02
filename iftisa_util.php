@@ -5,11 +5,13 @@
 function genLoginForm() {
 ?>
 <FORM name='fmLogin' method='POST' action=''>
-<label for="loginUsername">Username:</label><br>
-<INPUT type='text' id="loginUsername" name='username' size='20' placeholder='Username' required /><br>
-<label for="loginPassword">Password:</label><br>
-<INPUT type='password' id="loginPassword" name='password' size='20' placeholder='Password' required /><br><br>
-<INPUT type='submit' value='Login' />
+  <label for="loginUsername">Username:</label>
+  <INPUT type='text' id="loginUsername" name='username' placeholder='Enter your username' required />
+  
+  <label for="loginPassword">Password:</label>
+  <INPUT type='password' id="loginPassword" name='password' placeholder='Enter your password' required />
+  
+  <INPUT type='submit' value='Login' />
 </FORM>
 <?php
 }
