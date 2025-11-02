@@ -440,7 +440,7 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
     <div class="action-buttons">
       <button class="btn btn-secondary" onclick="window.print()"> Print Report</button>
       <button class="btn btn-primary" onclick="window.location.href='assessment_form.php?pid=<?php echo $session['pid']; ?>'"> New Assessment</button>
-      <button class="btn btn-secondary" onclick="window.location.href='patient.php?pid=<?php echo $session['pid']; ?>'"> View Patient</button>
+      <button class="btn btn-secondary" onclick="window.location.href='patientInfo.php?pid=<?php echo $session['pid']; ?>'"> View Patient</button>
     </div>
   </main>
 
