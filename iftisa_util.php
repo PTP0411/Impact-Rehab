@@ -5,18 +5,16 @@
 function genLoginForm() {
 ?>
 <FORM name='fmLogin' method='POST' action=''>
-  <label for="loginUsername">Username:</label>
-  <INPUT type='text' id="loginUsername" name='username' placeholder='Enter your username' required />
-  
-  <label for="loginPassword">Password:</label>
-  <INPUT type='password' id="loginPassword" name='password' placeholder='Enter your password' required />
-  
-  <INPUT type='submit' value='Login' />
+<label for="loginUsername">Username:</label><br>
+<INPUT type='text' id="loginUsername" name='username' size='20' placeholder='Username' required /><br>
+<label for="loginPassword">Password:</label><br>
+<INPUT type='password' id="loginPassword" name='password' size='20' placeholder='Password' required /><br><br>
+<INPUT type='submit' value='Login' />
 </FORM>
 <?php
 }
 
-function processLogin($db, $formData) {
+function oldprocessLogin($db, $formData) {
     $username = isset($formData['username']) ? trim($formData['username']) : '';
     $password = isset($formData['password']) ? $formData['password'] : '';
     
@@ -158,9 +156,9 @@ function getPatientInfo($db, $patient_id) {
 function generateTestItem($exercise_id, $label, $options) {
     $html = '<div class="test-item">';
     $html .= '<label for="' . htmlspecialchars($exercise_id) . '">' . htmlspecialchars($label) . '</label>';
-    $html .= '<select name="scores[' . substr($exercise_id, 2) . ']" id="' . htmlspecialchars($exercise_id) . '">';
+    $html .= '<select name="scores[' . substr($exercise_id, 2) . ']" id="' . htmlspecialchars($exercise_id) . '" required>';
     $html .= '<option value="">Select Score</option>';
-
+    
     foreach ($options as $value => $description) {
         $html .= '<option value="' . $value . '">' . htmlspecialchars($description) . '</option>';
     }
@@ -191,15 +189,10 @@ function saveAssessment($db, $patient_id, $scores) {
     try {
         $db->beginTransaction();
         
-        // Calculate MSK score based on completed tests only
+        // Calculate MSK score
         $total_score = array_sum($scores);
-        $completed_tests = count($scores);
-        $max_possible_score = $completed_tests * 5; // 5 points per test
-        
-        // Only calculate percentage if tests were completed
-        $percentage_score = $completed_tests > 0 
-            ? ($total_score / $max_possible_score) * 100 
-            : 0;
+        $max_possible_score = 125; // 25 exercises × 5 points each
+        $percentage_score = ($total_score / $max_possible_score) * 100;
         
         // Insert session
         $session_query = "INSERT INTO sessions (pid, session_date, session_time, msk_score) 
@@ -214,7 +207,7 @@ function saveAssessment($db, $patient_id, $scores) {
         
         $session_id = $db->lastInsertId();
         
-        // Insert individual scores (only for completed tests)
+        // Insert individual scores
         $score_query = "INSERT INTO scores (sid, eid, score) VALUES (:sid, :eid, :score)";
         $score_stmt = $db->prepare($score_query);
         
@@ -233,61 +226,6 @@ function saveAssessment($db, $patient_id, $scores) {
         error_log("Error saving assessment: " . $e->getMessage());
         return false;
     }
-}
-
-/**
- * Render the real-time score display widget
- */
-function renderScoreDisplay() {
-    return <<<HTML
-    <div class="score-display">
-      <h3>Current MSK Score</h3>
-      <div class="score-circle" id="score-circle">
-        <div class="score-value" id="current-score">0</div>
-        <div class="score-label">/100</div>
-      </div>
-      
-      <div class="score-breakdown">
-        <div class="score-category">
-          <div class="score-category-label">HumanTrak</div>
-          <div class="score-category-value"><span id="humantrak-score">0</span>%</div>
-        </div>
-        <div class="score-category">
-          <div class="score-category-label">Dynamo</div>
-          <div class="score-category-value"><span id="dynamo-score">0</span>%</div>
-        </div>
-        <div class="score-category">
-          <div class="score-category-label">ForceDecks</div>
-          <div class="score-category-value"><span id="forcedecks-score">0</span>%</div>
-        </div>
-      </div>
-      
-      <div class="completion-bar">
-        <div class="completion-fill" id="completion-fill"></div>
-      </div>
-      <div class="completion-text" id="completion-text">0 of 25 tests completed</div>
-      
-      <div class="tier-indicator" id="tier-indicator">Fill in tests to see projected tier</div>
-    </div>
-HTML;
-}
-
-/**
- * Render a test section with all tests
- */
-function renderTestSection($title, $icon, $tests) {
-    $html = "<div class='form-section'>\n";
-    $html .= "  <h3>$icon $title</h3>\n";
-    $html .= "  <div class='test-grid'>\n";
-    
-    foreach ($tests as $test) {
-        $html .= generateTestItem($test[0], $test[1], $test[2]);
-    }
-    
-    $html .= "  </div>\n";
-    $html .= "</div>\n";
-    
-    return $html;
 }
 
 ?>
