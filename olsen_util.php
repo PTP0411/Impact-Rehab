@@ -95,4 +95,196 @@ function processLogin($db, $formData) {
 }
 
 
+function genSearchBar()
+{?>
+    <form method="GET" class="search-form" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <input type="text" name="search" placeholder="Search..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+
+        <label style="display: inline-flex; align-items: center;">
+            <input type="radio" name="search_type" value="name" <?php if (!isset($_GET['search_type']) || $_GET['search_type'] === 'name') echo 'checked'; ?>>
+            <span style="margin-left: 4px;">Search by Name</span>
+        </label>
+
+        <label style="display: inline-flex; align-items: center;">
+            <input type="radio" name="search_type" value="dob" <?php if (isset($_GET['search_type']) && $_GET['search_type'] === 'dob') echo 'checked'; ?>>
+            <span style="margin-left: 4px;">Search by Birthday</span>
+        </label>
+
+        <button type="submit">Search</button>
+        <button type="button" onclick="clearSearch()">Clear</button>
+    </form>
+
+    <script>
+    function clearSearch() {
+        // Reset the form
+        const form = document.querySelector('.search-form');
+        form.reset();
+
+        // Remove query params by reloading the base URL
+        window.location.href = window.location.pathname;
+    }
+    </script>
+    <?php
+}
+
+function genAdminSearchBar()
+{
+    ?>
+    <div id="admin-search"></div>
+      <!-- Admin Patient Search Form -->
+    <form method="GET" action="#admin-search" class="admin-search-form" style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+      <input type="text" name="admin_search" placeholder="Search all patients..." value="<?php echo isset($_GET['admin_search']) ? htmlspecialchars($_GET['admin_search']) : ''; ?>">
+
+      <label style="display: inline-flex; align-items: center;">
+        <input type="radio" name="admin_search_type" value="name" <?php if (!isset($_GET['admin_search_type']) || $_GET['admin_search_type'] === 'name') echo 'checked'; ?>>
+        <span style="margin-left: 4px;">By Name</span>
+      </label>
+
+      <label style="display: inline-flex; align-items: center;">
+        <input type="radio" name="admin_search_type" value="dob" <?php if (isset($_GET['admin_search_type']) && $_GET['admin_search_type'] === 'dob') echo 'checked'; ?>>
+        <span style="margin-left: 4px;">By Birthday</span>
+      </label>
+
+      <label style="display: inline-flex; align-items: center;">
+        <input type="radio" name="admin_search_type" value="doctor" <?php if (isset($_GET['admin_search_type']) && $_GET['admin_search_type'] === 'doctor') echo 'checked'; ?>>
+        <span style="margin-left: 4px;">By Doctor</span>
+      </label>
+
+      <button type="submit">Search</button>
+      <button type="button" onclick="clearAdminSearch()">Clear</button>
+    </form>
+
+    <script>
+    function clearAdminSearch() {
+      // Reload the page without admin_search params
+      const url = new URL(window.location.href);
+      url.searchParams.delete('admin_search');
+      url.searchParams.delete('admin_search_type');
+      window.location.href = url.toString();
+    }
+    </script>
+    <?php
+}
+function displayPatients($patients) {
+    if (count($patients) === 0) {
+        echo '<div class="no-patients-card">';
+        echo '<h3>No Patients</h3>';
+        echo '<p>Ask an admin to assign you a patient.</p>';
+        echo '</div>';
+    } else {
+        foreach ($patients as $patient) {
+            echo '<div class="patient-card">';
+            echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
+            echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
+            echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
+            echo "<button class='bPatient' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
+            echo "<button class='bPatient' onclick=\"window.location.href='assessment_form.php?pid={$patient['pid']}'\">Start MSK Assessment</button>";
+            echo '</div>';
+        }
+    }
+}
+
+function displayAdminPatients($patients) {
+    if (count($patients) === 0) {
+        echo '<div class="no-patients-card">';
+        echo '<h3>No Patients Found</h3>';
+        echo '</div>';
+    } else {
+        foreach ($patients as $patient) {
+            echo '<div class="patient-card">';
+            echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
+            echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
+            echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
+
+            $doctorName = $patient['doctor_fname'] && $patient['doctor_lname'] 
+                ? htmlspecialchars($patient['doctor_fname'] . ' ' . $patient['doctor_lname'])
+                : 'Unassigned';
+            
+            echo '<p>Assigned Doctor: ' . $doctorName . '</p>';
+            echo "<button onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
+            echo "<button onclick=\"window.location.href='reassignPatient.php?pid={$patient['pid']}'\">Reassign Patient</button>";
+            echo '</div>';
+        }
+    }
+}
+
+
+
+function getPatientsForDoctor($db, $uid, $searchTerm = '', $searchType = 'name') {
+    if (!empty($searchTerm)) {
+        $searchTermWildcard = '%' . $searchTerm . '%';
+
+        if ($searchType === 'dob') {
+            // Optional: convert search to standard date format if needed
+            $stmt = $db->prepare("SELECT * FROM patients WHERE did = ? AND dob LIKE ?");
+        } else {
+            // Default: search by name
+            $stmt = $db->prepare("SELECT * FROM patients WHERE did = ? AND name LIKE ?");
+        }
+
+        $stmt->execute([$uid, $searchTermWildcard]);
+    } else {
+        $stmt = $db->prepare("SELECT * FROM patients WHERE did = ?");
+        $stmt->execute([$uid]);
+    }
+
+
+    // Return the results
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getPatientsForAdmin($db, $searchTerm = '', $searchType = 'name') {
+    // Set search term with wildcards
+    $searchTermWildcard = !empty($searchTerm) ? '%' . $searchTerm . '%' : '';
+
+    // Prepare query based on the search type
+    if (!empty($searchTerm)) {
+        switch ($searchType) {
+            case 'dob':
+                $stmt = $db->prepare("
+                    SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
+                    FROM patients
+                    LEFT JOIN users ON patients.did = users.uid
+                    WHERE patients.dob LIKE ?
+                ");
+                $stmt->execute([$searchTermWildcard]);
+                break;
+
+            case 'doctor':
+                $stmt = $db->prepare("
+                    SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
+                    FROM patients
+                    LEFT JOIN users ON patients.did = users.uid
+                    WHERE users.first_name LIKE ? OR users.last_name LIKE ?
+                ");
+                $stmt->execute([$searchTermWildcard, $searchTermWildcard]);
+                break;
+
+            case 'name':
+            default:
+                $stmt = $db->prepare("
+                    SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
+                    FROM patients
+                    LEFT JOIN users ON patients.did = users.uid
+                    WHERE patients.name LIKE ?
+                ");
+                $stmt->execute([$searchTermWildcard]);
+                break;
+        }
+    } else {
+        // No search term - get all patients
+        $stmt = $db->prepare("
+            SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
+            FROM patients
+            LEFT JOIN users ON patients.did = users.uid
+        ");
+        $stmt->execute();
+    }
+
+    // Return the results
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
 ?>
