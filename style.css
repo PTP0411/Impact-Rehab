@@ -441,8 +441,15 @@ button:hover {
 
 /* ==================== ASSESSMENT FORM STYLES ==================== */
 .assessment-form {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 2rem auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.assessment-form-content {
   background: white;
   padding: 2rem;
   border-radius: 12px;
@@ -546,7 +553,7 @@ button:hover {
   background: #5a6268;
 }
 
-/* Real-time Score Display */
+/* Real-time Score Display - Right Sidebar */
 .score-display {
   position: sticky;
   top: 20px;
@@ -555,20 +562,21 @@ button:hover {
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  margin-bottom: 2rem;
   text-align: center;
-  z-index: 100;
+  height: fit-content;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
 }
 
 .score-display h3 {
   margin: 0 0 1rem 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: white;
 }
 
 .score-circle {
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   margin: 0 auto 1rem;
   border-radius: 50%;
   background: rgba(255,255,255,0.2);
@@ -593,7 +601,7 @@ button:hover {
 }
 
 .score-value {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: bold;
   line-height: 1;
   position: relative;
@@ -601,33 +609,33 @@ button:hover {
 }
 
 .score-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   opacity: 0.9;
   position: relative;
   z-index: 1;
 }
 
 .score-breakdown {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-top: 1rem;
 }
 
 .score-category {
   background: rgba(255,255,255,0.15);
-  padding: 0.8rem;
+  padding: 0.75rem;
   border-radius: 8px;
 }
 
 .score-category-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   opacity: 0.9;
   margin-bottom: 0.3rem;
 }
 
 .score-category-value {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: bold;
 }
 
@@ -647,18 +655,19 @@ button:hover {
 }
 
 .completion-text {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   margin-top: 0.5rem;
   opacity: 0.9;
 }
 
 .tier-indicator {
   margin-top: 1rem;
-  padding: 0.5rem;
+  padding: 0.6rem;
   background: rgba(255,255,255,0.2);
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 /* ==================== ASSESSMENT RESULTS STYLES ==================== */
@@ -940,6 +949,25 @@ button:hover {
 }
 
 /* Responsive Design for Assessment Forms */
+@media (max-width: 1024px) {
+  .assessment-form {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .score-display {
+    position: relative;
+    top: 0;
+    max-height: none;
+  }
+  
+  .score-breakdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+}
+
 @media (max-width: 768px) {
   .score-content {
     flex-direction: column;

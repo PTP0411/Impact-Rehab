@@ -36,36 +36,39 @@ $patient_name = formatPatientName($patient);
 
   <main>
     <div class="assessment-form">
-      <!-- Patient Info -->
-      <div class="patient-info">
-        <h2>Patient: <?php echo htmlspecialchars($patient_name); ?></h2>
-        <p><strong>Assessment Date:</strong> <?php echo date('Y-m-d'); ?></p>
-        <p><strong>Evaluator:</strong> Dr. <?php echo htmlspecialchars($_SESSION['fullname']); ?></p>
+      <!-- Main Form Content (Left) -->
+      <div class="assessment-form-content">
+        <!-- Patient Info -->
+        <div class="patient-info">
+          <h2>Patient: <?php echo htmlspecialchars($patient_name); ?></h2>
+          <p><strong>Assessment Date:</strong> <?php echo date('Y-m-d'); ?></p>
+          <p><strong>Evaluator:</strong> Dr. <?php echo htmlspecialchars($_SESSION['fullname']); ?></p>
+        </div>
+
+        <!-- Assessment Form -->
+        <form id="msk-form" method="POST" action="calculate_score.php">
+          <input type="hidden" name="patient_id" value="<?php echo $patient_id; ?>">
+          <input type="hidden" name="doctor_id" value="<?php echo $_SESSION['uid']; ?>">
+          
+          <!-- HumanTrak Section -->
+          <?php echo renderTestSection('HumanTrak Assessment', '🏃', getHumanTrakTests()); ?>
+
+          <!-- Dynamo Section -->
+          <?php echo renderTestSection('Dynamo Assessment', '💪', getDynamoTests()); ?>
+
+          <!-- ForceDecks Section -->
+          <?php echo renderTestSection('ForceDecks Assessment', '⚡', getForceDecksTests()); ?>
+
+          <!-- Buttons -->
+          <div class="button-group">
+            <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
+            <button type="submit" class="btn-calculate">Calculate MSK Score</button>
+          </div>
+        </form>
       </div>
 
-      <!-- Real-time Score Display -->
+      <!-- Score Display Sidebar (Right) -->
       <?php echo renderScoreDisplay(); ?>
-
-      <!-- Assessment Form -->
-      <form id="msk-form" method="POST" action="calculate_score.php">
-        <input type="hidden" name="patient_id" value="<?php echo $patient_id; ?>">
-        <input type="hidden" name="doctor_id" value="<?php echo $_SESSION['uid']; ?>">
-        
-        <!-- HumanTrak Section -->
-        <?php echo renderTestSection('HumanTrak Assessment', '🏃', getHumanTrakTests()); ?>
-
-        <!-- Dynamo Section -->
-        <?php echo renderTestSection('Dynamo Assessment', '💪', getDynamoTests()); ?>
-
-        <!-- ForceDecks Section -->
-        <?php echo renderTestSection('ForceDecks Assessment', '⚡', getForceDecksTests()); ?>
-
-        <!-- Buttons -->
-        <div class="button-group">
-          <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
-          <button type="submit" class="btn-calculate">Calculate MSK Score</button>
-        </div>
-      </form>
     </div>
   </main>
 
