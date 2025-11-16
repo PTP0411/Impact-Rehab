@@ -7,33 +7,30 @@ session_start();
 if (isset($_GET['logout'])) {
     session_unset();
     session_destroy();
-    header("Location: login.php");
+    header("Location: logout.php");
     exit();
 }
 
 include_once('connect.php');
 include_once('philipUtil.php');
 
-$hardcoded_did = 5;
-$_SESSION['uid'] = $hardcoded_did;
 
 // Ensure user is logged in
-if (!isset($_SESSION['uid'])) {
-    // header("Location: login.php");
-    // exit();
-    $_SESSION['uid'] = 5;
+if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
+  header('Location: login.php');
+  exit();
 }
-
+$uid = $_SESSION['uid'];
 // Fetch user info
 $stmt = $db->prepare("SELECT first_name, last_name FROM users WHERE uid = ?");
-$stmt->execute([$hardcoded_did]);
+$stmt->execute([$uid]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
 if (!$user) {
-  die("Doctor with did = 5 not found.");
+  die("Doctor with did = ($uid) not found.");
 }
 
-$uid = $_SESSION['uid'];
 
 // Check if current user is admin
 $admin = isAdmin($db, $uid);
@@ -66,9 +63,58 @@ if (!$patient) {
 
 
 // Fetch sessions for the current patient
-$stmt = $db->prepare("SELECT session_date, msk_score FROM sessions WHERE pid = ? ORDER BY session_date ASC");
-$stmt->execute([$pid]);
+$startDate = isset($_GET['start']) && $_GET['start'] !== '' ? $_GET['start'] : null;
+$endDate = isset($_GET['end']) && $_GET['end'] !== '' ? $_GET['end'] : null;
+
+if ($startDate && $endDate) 
+{
+    // Both start and end provided
+    $stmt = $db->prepare("
+        SELECT sid, session_date, msk_score 
+        FROM sessions 
+        WHERE pid = ? AND session_date BETWEEN ? AND ? 
+        ORDER BY session_date ASC
+    ");
+    $stmt->execute([$pid, $startDate, $endDate]);
+
+} 
+elseif ($startDate) 
+{
+    // Only start date provided
+    $stmt = $db->prepare("
+        SELECT sid, session_date, msk_score 
+        FROM sessions 
+        WHERE pid = ? AND session_date >= ? 
+        ORDER BY session_date ASC
+    ");
+    $stmt->execute([$pid, $startDate]);
+
+} 
+elseif ($endDate) {
+    // Only end date provided
+    $stmt = $db->prepare("
+        SELECT sid, session_date, msk_score 
+        FROM sessions 
+        WHERE pid = ? AND session_date <= ? 
+        ORDER BY session_date ASC
+    ");
+    $stmt->execute([$pid, $endDate]);
+
+} 
+else 
+{
+    // No filters, get all sessions
+    $stmt = $db->prepare("
+        SELECT sid, session_date, msk_score 
+        FROM sessions 
+        WHERE pid = ? 
+        ORDER BY session_date ASC
+    ");
+    $stmt->execute([$pid]);
+}
+
 $sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Prepare arrays for Chart.js
 $sessionDates = [];
@@ -112,21 +158,73 @@ if ($admin) {
     <section class="patient-info">
     <h2 id="patient-name"><?php echo htmlspecialchars($patient['name']); ?></h2>
     <p><strong>Date of Birth:</strong> <?php echo htmlspecialchars($patient['dob']); ?></p>
-    <?php if ($admin): ?>
-        <p><strong>Assigned Doctor:</strong> <?php echo $doctorName; ?></p>
-        <button onclick="window.location.href='reassignPatient.php?pid=<?php echo $patient['pid']; ?>'">Reassign Patient</button>
+    <p><strong>Assigned Doctor:</strong> <?php echo htmlspecialchars($doctorName); ?></p>
+      
+    
+
+    <!-- Patient Note -->
+    <?php if (!empty($patient['note'])): ?>
+        <h3>Patient Note</h3>
+        <p><?php echo nl2br(htmlspecialchars($patient['note'])); ?></p>
+
+    <?php else: ?>
+        <h3>Patient Note</h3>
+        <p><em>No notes available.</em></p>
     <?php endif; ?>
+
+    <?php if ($admin): ?>
+      <button onclick="window.location.href='reassignPatient.php?pid=<?php echo $patient['pid']; ?>'">Reassign Patient</button>
+      <button onclick="window.location.href='editPatient.php?pid=<?php echo $patient['pid']; ?>'">Edit Patient Info</button>
+    <?php endif; ?>
+
+    </section>
+
+    <!-- Date range form -->
+    <form method="get" id="date-filter-form">
+      <input type="hidden" name="pid" value="<?php echo $pid; ?>">
+
+      <div class="date-fields">
+        <label for="start-date">Start Date:</label>
+        <input 
+          type="date" 
+          id="start-date" 
+          name="start" 
+          value="<?php echo isset($_GET['start']) ? htmlspecialchars($_GET['start']) : ''; ?>"
+        >
+
+        <label for="end-date">End Date:</label>
+        <input 
+          type="date" 
+          id="end-date" 
+          name="end" 
+          value="<?php echo isset($_GET['end']) ? htmlspecialchars($_GET['end']) : ''; ?>"
+        >
+      </div>
+
+      <div class="button-group">
+        <button type="submit">Filter</button>
+        <button type="button" onclick="clearSearch()">Clear</button>
+      </div>
+    </form>
+
 
      <!-- Overall Score Graph -->
      <section class="chart-section">
       <canvas id="scoreChart"></canvas>
-        </section>
+     </section>
+
+
+
+
       <label for="visit-select">Select Visit:</label>
       <select id="visit-select">
         <option value="">-- Select a Visit --</option>
-        <?php foreach ($sessionDates as $date): ?>
-            <option value="<?php echo $date; ?>"><?php echo $date; ?></option>
+        <?php foreach (array_reverse($sessions) as $session): ?>
+            <option value="<?php echo $session['sid']; ?>">
+                <?php echo htmlspecialchars($session['session_date']); ?>
+            </option>
         <?php endforeach; ?>
+
       </select>
         <button id="new-session-btn">+ New Session</button>
     </section>
@@ -134,59 +232,79 @@ if ($admin) {
   </main>
 
   
-
+  
   <script>
-    // Back button
-    document.getElementById("back-btn").addEventListener("click", () => {
-      window.location.href = "doctor.php";
-    });
+  // Back button
+  document.getElementById("back-btn").addEventListener("click", () => {
+    window.location.href = "doctor.php";
+  });
 
-    // Visit dropdown: redirect to visit.html with query string
-    document.getElementById("visit-select").addEventListener("change", function() {
-      const visitDate = this.value;
-      window.location.href = `visit.html?date=${visitDate}`;
-    });
+  // Visit dropdown
+  document.getElementById("visit-select").addEventListener("change", function() {
+    const sid = this.value;
+    if (sid) {
+      window.location.href = `assessment_result.php?sid=${sid}`;
+    }
+  });
 
-    // New session button (UI placeholder)
-    document.getElementById("new-session-btn").addEventListener("click", () => {
-      alert("Add new session form coming soon!");
-    });
+  // New session button
+  document.getElementById("new-session-btn").addEventListener("click", () => {
+    window.location.href = `assessment_form.php?pid=<?php echo $pid; ?>`;
+  });
 
-    // Demo Chart.js data
-    const ctx = document.getElementById("scoreChart").getContext("2d");
-    const scoreChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Mar', 'Jun', 'Sep'],
-        datasets: [{
-          label: 'Overall Score',
-          data: [65, 72, 78, 85],
-          fill: true,
-          backgroundColor: 'rgba(122, 185, 47, 0.2)',
-          borderColor: '#7ab92f',
-          borderWidth: 2,
-          tension: 0.3,
-          pointBackgroundColor: '#7ab92f'
-        }]
+  // Insert data
+  const sessionDates = <?php echo json_encode($sessionDates); ?>;
+  const scores = <?php echo json_encode($scores); ?>;
+
+  // Chart
+  const ctx = document.getElementById("scoreChart").getContext("2d");
+  const scoreChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sessionDates,
+      datasets: [{
+        label: 'MSK Score',
+        data: scores,
+        fill: true,
+        backgroundColor: 'rgba(122, 185, 47, 0.2)',
+        borderColor: '#7ab92f',
+        borderWidth: 2,
+        tension: 0.3,
+        pointBackgroundColor: '#7ab92f'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true },
+        tooltip: { mode: 'index', intersect: false }
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: true },
-          tooltip: { mode: 'index', intersect: false }
+      scales: {
+        y: {
+          suggestedMin: 0,
+          suggestedMax: 100,
+          title: { display: true, text: 'Score' }
         },
-        scales: {
-          y: {
-            suggestedMin: 0,
-            suggestedMax: 100,
-            title: { display: true, text: 'Score' }
-          },
-          x: {
-            title: { display: true, text: 'Visit Month' }
-          }
+        x: {
+          title: { display: true, text: 'Session Date' }
         }
       }
-    });
-  </script>
+    }
+  });
+</script>
+
+<script>
+    function clearSearch() {
+    // Reset the form
+    const form = document.getElementById('date-filter-form');
+    form.reset();
+
+    // Reload the same page without query parameters (keep pid)
+    const pid = <?php echo json_encode($pid); ?>;
+    window.location.href = window.location.pathname + '?pid=' + pid;
+}
+    </script>
+
+
 </body>
 </html>

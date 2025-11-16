@@ -86,7 +86,7 @@ $doctors = $db->query("
 
     <form method="POST">
       <label for="new_did">Select New Doctor:</label>
-      <select name="new_did" id="new_did" required>
+      <select name="new_did" id="new_did" required style="width: 100%; padding: 5px;">
         <option value="">-- Select Doctor --</option>
         <?php foreach ($doctors as $doc): ?>
           <option value="<?php echo $doc['uid']; ?>" <?php echo ($doc['uid'] == $patient['did']) ? 'selected' : ''; ?>>
