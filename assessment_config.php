@@ -15,52 +15,52 @@ function getHumanTrakTests() {
             0 => '0 - Visible dysfunction'
         ]],
         ['ex2', 'Neck Flexion', [
-            5 => '5 - ≥50° pain-free',
-            4 => '4 - 40-49° w/ slight stiffness',
-            3 => '3 - 30-39° or mild pain',
-            2 => '2 - <30°',
+            5 => '5 - >=50deg pain-free',
+            4 => '4 - 40-49deg w/ slight stiffness',
+            3 => '3 - 30-39deg or mild pain',
+            2 => '2 - <30deg',
             1 => '1 - Unable or painful',
             0 => '0 - Unable or painful'
         ]],
         ['ex3', 'Neck Lateral Flexion', [
-            5 => '5 - ≥50° pain-free',
-            4 => '4 - 40-49° w/ slight stiffness',
-            3 => '3 - 30-39° or mild pain',
-            2 => '2 - <30°',
+            5 => '5 - >=50deg pain-free',
+            4 => '4 - 40-49deg w/ slight stiffness',
+            3 => '3 - 30-39deg or mild pain',
+            2 => '2 - <30deg',
             1 => '1 - Unable or painful',
             0 => '0 - Unable or painful'
         ]],
         ['ex4', 'Neck Rotation', [
-            5 => '5 - ≥80° bilaterally',
-            4 => '4 - 70-79°',
-            3 => '3 - 60-69°',
-            2 => '2 - 45-59°',
-            1 => '1 - <45° or painful',
-            0 => '0 - <45° or painful'
+            5 => '5 - >=80deg bilaterally',
+            4 => '4 - 70-79deg',
+            3 => '3 - 60-69deg',
+            2 => '2 - 45-59deg',
+            1 => '1 - <45deg or painful',
+            0 => '0 - <45deg or painful'
         ]],
         ['ex5', 'Shoulder Flexion', [
-            5 => '5 - ≥170° bilaterally',
-            4 => '4 - 155-169°',
-            3 => '3 - 140-154°',
-            2 => '2 - 120-139°',
-            1 => '1 - <120° or pain',
-            0 => '0 - <120° or pain'
+            5 => '5 - >=170deg bilaterally',
+            4 => '4 - 155-169deg',
+            3 => '3 - 140-154deg',
+            2 => '2 - 120-139deg',
+            1 => '1 - <120deg or pain',
+            0 => '0 - <120deg or pain'
         ]],
-        ['ex6', 'Shoulder ER @ 90° Abd', [
-            5 => '5 - ≥90° both arms',
-            4 => '4 - 80-89°',
-            3 => '3 - 70-79°',
-            2 => '2 - 60-69° or asymmetry >10°',
-            1 => '1 - <60° or pain',
-            0 => '0 - <60° or pain'
+        ['ex6', 'Shoulder ER @ 90deg Abd', [
+            5 => '5 - >=90deg both arms',
+            4 => '4 - 80-89deg',
+            3 => '3 - 70-79deg',
+            2 => '2 - 60-69deg or asymmetry >10deg',
+            1 => '1 - <60deg or pain',
+            0 => '0 - <60deg or pain'
         ]],
-        ['ex7', 'Shoulder IR @ 90° Abd', [
-            5 => '5 - ≥90° both arms',
-            4 => '4 - 80-89°',
-            3 => '3 - 70-79°',
-            2 => '2 - 60-69° or asymmetry >10°',
-            1 => '1 - <60° or pain',
-            0 => '0 - <60° or pain'
+        ['ex7', 'Shoulder IR @ 90deg Abd', [
+            5 => '5 - >=90deg both arms',
+            4 => '4 - 80-89deg',
+            3 => '3 - 70-79deg',
+            2 => '2 - 60-69deg or asymmetry >10deg',
+            1 => '1 - <60deg or pain',
+            0 => '0 - <60deg or pain'
         ]],
         ['ex8', 'Trunk Flexion', [
             5 => '5 - Fingers to floor',
@@ -79,12 +79,12 @@ function getHumanTrakTests() {
             0 => '0 - Asymmetry or pain'
         ]],
         ['ex10', 'Trunk Rotation', [
-            5 => '5 - ≥50° each side',
-            4 => '4 - 45-49°',
-            3 => '3 - 35-44°',
-            2 => '2 - 25-34°',
-            1 => '1 - <25° or painful',
-            0 => '0 - <25° or painful'
+            5 => '5 - >=50deg each side',
+            4 => '4 - 45-49deg',
+            3 => '3 - 35-44deg',
+            2 => '2 - 25-34deg',
+            1 => '1 - <25deg or painful',
+            0 => '0 - <25deg or painful'
         ]],
         ['ex11', 'Trunk Extension', [
             5 => '5 - Full spinal extension',
@@ -119,18 +119,18 @@ function getHumanTrakTests() {
             0 => '0 - Incomplete'
         ]],
         ['ex15', 'Seated Hip ER', [
-            5 => '5 - ≥45° both hips + <10° asymmetry',
-            4 => '4 - 40-44°',
-            3 => '3 - 30-39°',
-            2 => '2 - <30° or asymmetry >15°',
+            5 => '5 - >=45deg both hips + <10deg asymmetry',
+            4 => '4 - 40-44deg',
+            3 => '3 - 30-39deg',
+            2 => '2 - <30deg or asymmetry >15deg',
             1 => '1 - Pain or block',
             0 => '0 - Pain or block'
         ]],
         ['ex16', 'Seated Hip IR', [
-            5 => '5 - ≥45° both hips + <10° asymmetry',
-            4 => '4 - 40-44°',
-            3 => '3 - 30-39°',
-            2 => '2 - <30° or asymmetry >15°',
+            5 => '5 - >=45deg both hips + <10deg asymmetry',
+            4 => '4 - 40-44deg',
+            3 => '3 - 30-39deg',
+            2 => '2 - <30deg or asymmetry >15deg',
             1 => '1 - Pain or block',
             0 => '0 - Pain or block'
         ]]
@@ -193,9 +193,9 @@ function getForceDecksTests() {
             0 => '0 - Fall or pain'
         ]],
         ['ex25', 'IMTP', [
-            5 => '5 - ≥4.0× BW', 4 => '4 - 3.0-3.9× BW',
-            3 => '3 - 2.5-2.9× BW', 2 => '2 - 2.0-2.4× BW',
-            1 => '1 - <2.0× or poor form', 0 => '0 - <2.0× or poor form'
+            5 => '5 - >=4.0x BW', 4 => '4 - 3.0-3.9x BW',
+            3 => '3 - 2.5-2.9x BW', 2 => '2 - 2.0-2.4x BW',
+            1 => '1 - <2.0x or poor form', 0 => '0 - <2.0x or poor form'
         ]]
     ];
 }
