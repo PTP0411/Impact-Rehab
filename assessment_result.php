@@ -43,293 +43,6 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
   <title>MSK Assessment Results - Impact Rehab</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .results-container {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 1rem;
-    }
-    
-    .score-card {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    
-    .score-card h2 {
-      color: #7ab92f;
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
-    }
-    
-    .score-content {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3rem;
-      margin: 1.5rem 0;
-    }
-    
-    .chart-wrapper {
-      position: relative;
-      width: 200px;
-      height: 200px;
-    }
-    
-    .chart-center-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-    }
-    
-    .chart-center-text .score-number {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: <?php echo $color; ?>;
-      line-height: 1;
-    }
-    
-    .chart-center-text .score-total {
-      font-size: 1rem;
-      color: #666;
-    }
-    
-    .score-info {
-      text-align: left;
-    }
-    
-    .tier-badge {
-      display: inline-block;
-      background: <?php echo $color; ?>;
-      color: white;
-      padding: 0.5rem 1.5rem;
-      border-radius: 20px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
-    
-    .score-info p {
-      margin: 0.5rem 0;
-      color: #333;
-      font-size: 1rem;
-    }
-    
-    .score-info .handicap {
-      color: #666;
-      font-size: 0.95rem;
-    }
-    
-    .scores-section {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 2rem;
-    }
-    
-    .scores-section h3 {
-      color: #7ab92f;
-      margin-bottom: 1rem;
-      font-size: 1.3rem;
-      border-bottom: 2px solid #7ab92f;
-      padding-bottom: 0.5rem;
-    }
-    
-    .score-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-    
-    .score-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.8rem;
-      background: #f9f9f9;
-      border-radius: 6px;
-      border-left: 3px solid #7ab92f;
-    }
-    
-    .score-item .name {
-      font-weight: 600;
-      color: #333;
-    }
-    
-    .score-item .value {
-      font-weight: bold;
-      color: #7ab92f;
-      font-size: 1.1rem;
-    }
-    
-    .action-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 2rem;
-    }
-    
-    .btn {
-      padding: 0.8rem 2rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    
-    .btn-primary {
-      background: #7ab92f;
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background: #5d8e24;
-    }
-    
-    .btn-secondary {
-      background: #6c757d;
-      color: white;
-    }
-    
-    .btn-secondary:hover {
-      background: #5a6268;
-    }
-    
-    .patient-header {
-      background: #e8f5e9;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 2rem;
-    }
-    
-    @media (max-width: 768px) {
-      .score-content {
-        flex-direction: column;
-        gap: 1.5rem;
-      }
-    }
-
-    /* Print Styles */
-    @media print {
-      body {
-        background: white;
-        margin: 0;
-        padding: 0;
-      }
-
-      header, .action-buttons {
-        display: none !important;
-      }
-
-      .results-container {
-        max-width: 100%;
-        margin: 0;
-        padding: 20px;
-      }
-
-      .patient-header {
-        background: #f0f0f0 !important;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-        page-break-after: avoid;
-      }
-
-      .score-card, .scores-section {
-        box-shadow: none;
-        border: 1px solid #ddd;
-        page-break-inside: avoid;
-      }
-
-      .tier-badge {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-      }
-
-      .score-item {
-        page-break-inside: avoid;
-      }
-
-      .print-header {
-        display: block !important;
-        text-align: center;
-        margin-bottom: 30px;
-        padding-bottom: 15px;
-        border-bottom: 3px solid #7ab92f;
-      }
-
-      .print-header h1 {
-        color: #7ab92f;
-        margin: 0;
-        font-size: 28px;
-      }
-
-      .print-header p {
-        margin: 5px 0;
-        color: #666;
-      }
-
-      .print-footer {
-        display: block !important;
-        text-align: center;
-        margin-top: 30px;
-        padding-top: 15px;
-        border-top: 2px solid #ddd;
-        font-size: 12px;
-        color: #666;
-      }
-
-      .category-summary {
-        display: block !important;
-        background: #f9f9f9;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 8px;
-        page-break-inside: avoid;
-      }
-
-      .category-summary h4 {
-        color: #7ab92f;
-        margin-top: 0;
-      }
-
-      .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        margin-top: 10px;
-      }
-
-      .summary-item {
-        text-align: center;
-        padding: 10px;
-        background: white;
-        border-radius: 5px;
-      }
-
-      .summary-item .label {
-        font-size: 12px;
-        color: #666;
-        margin-bottom: 5px;
-      }
-
-      .summary-item .value {
-        font-size: 20px;
-        font-weight: bold;
-        color: #7ab92f;
-      }
-    }
-
-    .print-header, .print-footer, .category-summary {
-      display: none;
-    }
-  </style>
 </head>
 <body>
   <!-- Print-only header -->
@@ -358,13 +71,13 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
         <div class="chart-wrapper">
           <canvas id="scoreChart"></canvas>
           <div class="chart-center-text">
-            <div class="score-number"><?php echo $msk_score; ?></div>
+            <div class="score-number" style="color: <?php echo $color; ?>;"><?php echo $msk_score; ?></div>
             <div class="score-total">/100</div>
           </div>
         </div>
         
         <div class="score-info">
-          <div class="tier-badge"><?php echo $tier; ?></div>
+          <div class="tier-badge" style="background: <?php echo $color; ?>;"><?php echo $tier; ?></div>
           <p><strong>Golf Handicap Equivalent:</strong> <?php echo $handicap; ?></p>
           <p class="handicap">Assessment completed on <?php echo date('M d, Y', strtotime($session['session_date'])); ?></p>
         </div>
@@ -392,7 +105,7 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
 
     <!-- HumanTrak Scores -->
     <div class="scores-section">
-      <h3> HumanTrak Assessment</h3>
+      <h3>🏃 HumanTrak Assessment</h3>
       <div class="score-grid">
         <?php foreach ($humanTrakScores as $item): ?>
           <div class="score-item">
@@ -405,7 +118,7 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
 
     <!-- Dynamo Scores -->
     <div class="scores-section">
-      <h3> Dynamo Assessment</h3>
+      <h3>💪 Dynamo Assessment</h3>
       <div class="score-grid">
         <?php foreach ($dynamoScores as $item): ?>
           <div class="score-item">
@@ -418,7 +131,7 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
 
     <!-- ForceDecks Scores -->
     <div class="scores-section">
-      <h3> ForceDecks Assessment</h3>
+      <h3>⚡ ForceDecks Assessment</h3>
       <div class="score-grid">
         <?php foreach ($forceDecksScores as $item): ?>
           <div class="score-item">
@@ -438,9 +151,9 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button class="btn btn-secondary" onclick="window.print()"> Print Report</button>
-      <button class="btn btn-primary" onclick="window.location.href='assessment_form.php?pid=<?php echo $session['pid']; ?>'"> New Assessment</button>
-      <button class="btn btn-secondary" onclick="window.location.href='patientInfo.php?pid=<?php echo $session['pid']; ?>'"> View Patient</button>
+      <button class="btn btn-secondary" onclick="window.print()">🖨 Print Report</button>
+      <button class="btn btn-primary" onclick="window.location.href='assessment_form.php?pid=<?php echo $session['pid']; ?>'">📝 New Assessment</button>
+      <button class="btn btn-secondary" onclick="window.location.href='patientInfo.php?pid=<?php echo $session['pid']; ?>'">👤 View Patient</button>
     </div>
   </main>
 

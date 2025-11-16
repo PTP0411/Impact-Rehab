@@ -8,7 +8,6 @@ if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
 include_once("connect.php");
 include_once("iftisa_util.php");
 include_once("assessment_config.php");
-include_once("assessment_styles.php");
 include_once("assessment_js.php");
 
 // Get patient info
@@ -28,7 +27,6 @@ $patient_name = formatPatientName($patient);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MSK Assessment Form - Impact Rehab</title>
   <link rel="stylesheet" href="style.css">
-  <?php echo getAssessmentStyles(); ?>
 </head>
 <body>
   <header>

@@ -438,3 +438,519 @@ button:hover {
   max-width: 300px; /* scale down width */
   margin: 1rem auto; /* center the chart */
 }
+
+/* ==================== ASSESSMENT FORM STYLES ==================== */
+.assessment-form {
+  max-width: 1200px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #7ab92f;
+}
+
+.form-section h3 {
+  color: #7ab92f;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.test-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.test-item label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.test-item select {
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+}
+
+.test-item select:focus {
+  outline: none;
+  border-color: #7ab92f;
+  box-shadow: 0 0 0 2px rgba(122, 185, 47, 0.1);
+}
+
+.test-item select.filled {
+  border-color: #7ab92f;
+  background: #f0f9eb;
+  transition: all 0.3s;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+.btn-calculate {
+  background: #7ab92f;
+  color: white;
+  border: none;
+  padding: 1rem 3rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-calculate:hover {
+  background: #5d8e24;
+  transform: translateY(-2px);
+}
+
+.btn-calculate:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-cancel {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #5a6268;
+}
+
+/* Real-time Score Display */
+.score-display {
+  position: sticky;
+  top: 20px;
+  background: linear-gradient(135deg, #7ab92f 0%, #5d8e24 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  margin-bottom: 2rem;
+  text-align: center;
+  z-index: 100;
+}
+
+.score-display h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.score-circle {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid rgba(255,255,255,0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.score-circle::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--score-height, 0%);
+  background: rgba(255,255,255,0.3);
+  transition: height 0.5s ease;
+}
+
+.score-value {
+  font-size: 3rem;
+  font-weight: bold;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.score-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
+}
+
+.score-breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.score-category {
+  background: rgba(255,255,255,0.15);
+  padding: 0.8rem;
+  border-radius: 8px;
+}
+
+.score-category-label {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-bottom: 0.3rem;
+}
+
+.score-category-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.completion-bar {
+  margin-top: 1rem;
+  background: rgba(255,255,255,0.2);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.completion-fill {
+  height: 100%;
+  background: white;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.completion-text {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  opacity: 0.9;
+}
+
+.tier-indicator {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: rgba(255,255,255,0.2);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ==================== ASSESSMENT RESULTS STYLES ==================== */
+.results-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.score-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.score-card h2 {
+  color: #7ab92f;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.score-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  margin: 1.5rem 0;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.chart-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.chart-center-text .score-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.chart-center-text .score-total {
+  font-size: 1rem;
+  color: #666;
+}
+
+.score-info {
+  text-align: left;
+}
+
+.tier-badge {
+  display: inline-block;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.score-info p {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.score-info .handicap {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.scores-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.scores-section h3 {
+  color: #7ab92f;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #7ab92f;
+  padding-bottom: 0.5rem;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.score-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem;
+  background: #f9f9f9;
+  border-radius: 6px;
+  border-left: 3px solid #7ab92f;
+}
+
+.score-item .name {
+  font-weight: 600;
+  color: #333;
+}
+
+.score-item .value {
+  font-weight: bold;
+  color: #7ab92f;
+  font-size: 1.1rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-primary {
+  background: #7ab92f;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #5d8e24;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.patient-header {
+  background: #e8f5e9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.print-header, .print-footer, .category-summary {
+  display: none;
+}
+
+/* Print Styles for Results */
+@media print {
+  body {
+    background: white;
+    margin: 0;
+    padding: 0;
+  }
+
+  header, .action-buttons {
+    display: none !important;
+  }
+
+  .results-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .patient-header {
+    background: #f0f0f0 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    page-break-after: avoid;
+  }
+
+  .score-card, .scores-section {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    page-break-inside: avoid;
+  }
+
+  .tier-badge {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .score-item {
+    page-break-inside: avoid;
+  }
+
+  .print-header {
+    display: block !important;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #7ab92f;
+  }
+
+  .print-header h1 {
+    color: #7ab92f;
+    margin: 0;
+    font-size: 28px;
+  }
+
+  .print-header p {
+    margin: 5px 0;
+    color: #666;
+  }
+
+  .print-footer {
+    display: block !important;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 2px solid #ddd;
+    font-size: 12px;
+    color: #666;
+  }
+
+  .category-summary {
+    display: block !important;
+    background: #f9f9f9;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 8px;
+    page-break-inside: avoid;
+  }
+
+  .category-summary h4 {
+    color: #7ab92f;
+    margin-top: 0;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .summary-item {
+    text-align: center;
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+  }
+
+  .summary-item .label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+
+  .summary-item .value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #7ab92f;
+  }
+}
+
+/* Responsive Design for Assessment Forms */
+@media (max-width: 768px) {
+  .score-content {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .test-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .score-breakdown {
+    grid-template-columns: 1fr;
+  }
+}

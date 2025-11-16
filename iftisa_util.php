@@ -149,29 +149,6 @@ function getPatientInfo($db, $patient_id) {
 }
 
 /**
- * Generate assessment form select options
- * @param string $exercise_id - Exercise ID for the select element
- * @param string $label - Label for the exercise
- * @param array $options - Array of [value => description] pairs
- * @return string - HTML for the test item
- */
-function generateTestItem($exercise_id, $label, $options) {
-    $html = '<div class="test-item">';
-    $html .= '<label for="' . htmlspecialchars($exercise_id) . '">' . htmlspecialchars($label) . '</label>';
-    $html .= '<select name="scores[' . substr($exercise_id, 2) . ']" id="' . htmlspecialchars($exercise_id) . '">';
-    $html .= '<option value="">Select Score</option>';
-
-    foreach ($options as $value => $description) {
-        $html .= '<option value="' . $value . '">' . htmlspecialchars($description) . '</option>';
-    }
-    
-    $html .= '</select>';
-    $html .= '</div>';
-    
-    return $html;
-}
-
-/**
  * Format patient's full name
  * @param array $patient - Patient data array with first_name and last_name
  * @return string - Full name
@@ -235,8 +212,34 @@ function saveAssessment($db, $patient_id, $scores) {
     }
 }
 
+// ==================== ASSESSMENT FORM RENDERING FUNCTIONS ====================
+
+/**
+ * Generate assessment form select options
+ * @param string $exercise_id - Exercise ID for the select element
+ * @param string $label - Label for the exercise
+ * @param array $options - Array of [value => description] pairs
+ * @return string - HTML for the test item
+ */
+function generateTestItem($exercise_id, $label, $options) {
+    $html = '<div class="test-item">';
+    $html .= '<label for="' . htmlspecialchars($exercise_id) . '">' . htmlspecialchars($label) . '</label>';
+    $html .= '<select name="scores[' . substr($exercise_id, 2) . ']" id="' . htmlspecialchars($exercise_id) . '">';
+    $html .= '<option value="">Select Score</option>';
+
+    foreach ($options as $value => $description) {
+        $html .= '<option value="' . $value . '">' . htmlspecialchars($description) . '</option>';
+    }
+    
+    $html .= '</select>';
+    $html .= '</div>';
+    
+    return $html;
+}
+
 /**
  * Render the real-time score display widget
+ * @return string - HTML for score display
  */
 function renderScoreDisplay() {
     return <<<HTML
@@ -274,6 +277,10 @@ HTML;
 
 /**
  * Render a test section with all tests
+ * @param string $title - Section title
+ * @param string $icon - Icon emoji for the section
+ * @param array $tests - Array of test definitions [exercise_id, label, options]
+ * @return string - HTML for the test section
  */
 function renderTestSection($title, $icon, $tests) {
     $html = "<div class='form-section'>\n";
