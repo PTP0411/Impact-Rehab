@@ -1,10 +1,10 @@
 <?php
 // connect.php
 
-$server = "cray.cs.gettysburg.edu";
+$server = "localhost";
 $dbname = "f25_impact";
-$user = "olsema01";
-$pass = "WR27515";
+$user = "root";
+$pass = "";
 
 try {
     $db = new PDO("mysql:host=$server; dbname=$dbname", $user, $pass);

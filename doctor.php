@@ -16,10 +16,9 @@ include_once('philipUtil.php');
 include_once('iftisa_util.php');
 
 
-// print($did);
 // Ensure user is logged in
 if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
-  header('Location: login.php');
+  header('Location: index.php');
   exit();
 }
 

@@ -297,4 +297,25 @@ function renderTestSection($title, $icon, $tests) {
     return $html;
 }
 
+/**
+ * Save doctor's comments for a session
+ * @param PDO $db - Database connection
+ * @param int $session_id - Session ID
+ * @param string $comments - Doctor's comments
+ * @return bool - True on success, false on failure
+ */
+function saveDoctorComments($db, $session_id, $comments) {
+    try {
+        $query = "UPDATE sessions SET doctor_comments = :comments WHERE sid = :sid";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':comments', $comments, PDO::PARAM_STR);
+        $stmt->bindParam(':sid', $session_id, PDO::PARAM_INT);
+        
+        return $stmt->execute();
+    } catch (PDOException $e) {
+        error_log("Error saving doctor comments: " . $e->getMessage());
+        return false;
+    }
+}
+
 ?>
