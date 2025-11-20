@@ -1,57 +1,58 @@
-/* ==================== COLOR SCHEME VARIABLES ==================== */
+/* ==================== PROFESSIONAL COLOR SCHEME ==================== */
 :root {
-  /* Primary - Navigation & Main UI */
-  --primary-blue: #1976D2;
-  --primary-blue-light: #2196F3;
-  --primary-blue-bg: #E3F2FD;
+  /* Primary - Navigation & Main UI - Professional Navy */
+  --primary-blue: #2C5F87;
+  --primary-blue-light: #3D7199;
+  --primary-blue-dark: #1E4563;
+  --primary-blue-bg: #E8F1F7;
   
-  /* Sections */
-  --assessment-teal: #00ACC1;
-  --assessment-teal-dark: #00838F;
-  --assessment-teal-light: #B2EBF2;
+  /* Sections - Sophisticated Palette */
+  --assessment-teal: #3A7D8F;
+  --assessment-teal-dark: #2A6170;
+  --assessment-teal-light: #D4E8ED;
   
-  --patient-purple: #7E57C2;
-  --patient-purple-dark: #5E35B1;
-  --patient-purple-light: #E1BEE7;
+  --patient-purple: #6B7A9E;
+  --patient-purple-dark: #515F7F;
+  --patient-purple-light: #DFE3ED;
   
-  --report-indigo: #5C6BC0;
-  --report-indigo-dark: #3949AB;
-  --report-indigo-light: #C5CAE9;
+  --report-indigo: #4A6B8A;
+  --report-indigo-dark: #365170;
+  --report-indigo-light: #D9E3EB;
   
-  --action-orange: #FF9800;
-  --action-orange-dark: #F57C00;
-  --action-orange-light: #FFE0B2;
+  --action-orange: #C67D3A;
+  --action-orange-dark: #A46527;
+  --action-orange-light: #F0E1D0;
   
-  /* Semantic */
-  --success-green: #4CAF50;
-  --success-green-dark: #388E3C;
-  --success-green-light: #C8E6C9;
+  /* Semantic - Professional Medical Colors */
+  --success-green: #4A7C59;
+  --success-green-dark: #356344;
+  --success-green-light: #D8E8DD;
   
-  --warning-yellow: #FFC107;
-  --warning-yellow-dark: #FFA000;
-  --warning-yellow-light: #FFECB3;
+  --warning-yellow: #C9A03A;
+  --warning-yellow-dark: #A58028;
+  --warning-yellow-light: #F5EDD8;
   
-  --error-red: #E53935;
-  --error-red-dark: #C62828;
-  --error-red-light: #FFCDD2;
+  --error-red: #B5574D;
+  --error-red-dark: #93413A;
+  --error-red-light: #EDD9D7;
   
-  --info-blue: #2196F3;
-  --info-blue-dark: #1976D2;
-  --info-blue-light: #BBDEFB;
+  --info-blue: #4A7A9E;
+  --info-blue-dark: #355979;
+  --info-blue-light: #D9E5EE;
   
-  /* Neutrals */
-  --text-dark: #212121;
-  --text-medium: #757575;
-  --text-light: #BDBDBD;
+  /* Neutrals - Refined Grays */
+  --text-dark: #2A3640;
+  --text-medium: #6B7684;
+  --text-light: #A8B1BC;
   --bg-white: #FFFFFF;
-  --bg-light: #F5F5F5;
-  --bg-lighter: #FAFAFA;
-  --border-light: #E0E0E0;
+  --bg-light: #F7F8FA;
+  --bg-lighter: #FAFBFC;
+  --border-light: #DDE2E8;
   
-  /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
-  --shadow-lg: 0 8px 20px rgba(0,0,0,0.2);
+  /* Shadows - Subtle Professional */
+  --shadow-sm: 0 1px 3px rgba(42, 54, 64, 0.08);
+  --shadow-md: 0 3px 8px rgba(42, 54, 64, 0.12);
+  --shadow-lg: 0 6px 16px rgba(42, 54, 64, 0.15);
 }
 
 body {
