@@ -49,15 +49,15 @@ $patient_name = formatPatientName($patient);
         <form id="msk-form" method="POST" action="calculate_score.php">
           <input type="hidden" name="patient_id" value="<?php echo $patient_id; ?>">
           <input type="hidden" name="doctor_id" value="<?php echo $_SESSION['uid']; ?>">
-          
-          <!-- HumanTrak Section -->
-          <?php echo renderTestSection('HumanTrak Assessment', '🏃', getHumanTrakTests()); ?>
 
-          <!-- Dynamo Section -->
-          <?php echo renderTestSection('Dynamo Assessment', '💪', getDynamoTests()); ?>
+          <!-- Movement Section -->
+          <?php echo renderTestSection('Movement Assessment', '🏃', getHumanTrakTests()); ?>
 
-          <!-- ForceDecks Section -->
-          <?php echo renderTestSection('ForceDecks Assessment', '⚡', getForceDecksTests()); ?>
+          <!-- Grip Strength Section -->
+          <?php echo renderTestSection('Grip Strength Assessment', '💪', getDynamoTests()); ?>
+
+          <!-- Balance and Power Section -->
+          <?php echo renderTestSection('Balance and Power Assessment', '⚡', getForceDecksTests()); ?>
 
           <!-- Buttons -->
           <div class="button-group">

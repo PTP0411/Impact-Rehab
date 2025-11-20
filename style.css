@@ -978,8 +978,8 @@ input[type="number"]:focus {
     background: white;
     margin: 0;
     padding: 0;
-    font-size: 11pt;
-    line-height: 1.4;
+    font-size: 10pt;
+    line-height: 1.3;
     color: #000;
   }
 
@@ -1009,14 +1009,17 @@ input[type="number"]:focus {
   .results-container {
     max-width: 100%;
     margin: 0;
-    padding: 0.5in;
+    padding: 0.4in 0.5in;
   }
 
-  /* ===== PROFESSIONAL HEADER ===== */
+  /* ===== COMPACT PROFESSIONAL HEADER ===== */
   .print-header {
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 3px solid var(--primary-blue);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-blue);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
@@ -1024,48 +1027,49 @@ input[type="number"]:focus {
   .print-logo h1 {
     color: var(--primary-blue);
     margin: 0;
-    font-size: 28pt;
+    font-size: 18pt;
     font-weight: bold;
-    letter-spacing: -0.5px;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
   .print-subtitle {
-    margin: 3px 0 15px 0;
+    margin: 2px 0 0 0;
     color: #666;
-    font-size: 11pt;
+    font-size: 9pt;
     font-style: italic;
   }
 
   .print-document-title h2 {
-    margin: 8px 0 3px 0;
-    font-size: 20pt;
+    margin: 0;
+    font-size: 14pt;
     color: #333;
     font-weight: bold;
+    text-align: right;
   }
 
   .print-document-title p {
-    margin: 0;
+    margin: 2px 0 0 0;
     color: #666;
-    font-size: 10pt;
+    font-size: 8pt;
+    text-align: right;
   }
 
-  /* ===== PATIENT SUMMARY SECTION ===== */
+  /* ===== COMPACT PATIENT SUMMARY ===== */
   .print-patient-summary {
     background: #f8f8f8;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border-left: 4px solid var(--report-indigo);
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border-left: 3px solid var(--report-indigo);
     page-break-inside: avoid;
   }
 
   .print-summary-row {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 15px;
   }
 
   .print-summary-item {
@@ -1075,41 +1079,41 @@ input[type="number"]:focus {
   .print-label {
     font-weight: 600;
     color: #555;
-    font-size: 9pt;
+    font-size: 8pt;
     display: block;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
   }
 
   .print-value {
-    font-size: 11pt;
+    font-size: 10pt;
     color: #000;
     font-weight: 500;
   }
 
-  /* ===== SCORE SUMMARY SECTION ===== */
+  /* ===== COMPACT SCORE SUMMARY - INLINE LAYOUT ===== */
   .print-score-summary {
-    background: linear-gradient(135deg, #E8F5FE 0%, #ffffff 100%);
+    background: #f0f7fb;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 2px solid var(--report-indigo);
-    border-radius: 8px;
-    text-align: center;
+    padding: 10px 15px;
+    margin-bottom: 12px;
+    border-left: 3px solid var(--report-indigo);
     page-break-inside: avoid;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .print-score-main {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
   }
 
   .print-score-number {
-    font-size: 48pt;
+    font-size: 28pt;
     font-weight: bold;
     color: var(--report-indigo);
     print-color-adjust: exact;
@@ -1118,30 +1122,30 @@ input[type="number"]:focus {
   }
 
   .print-score-total {
-    font-size: 24pt;
+    font-size: 14pt;
     color: #999;
   }
 
   .print-score-tier {
     display: inline-block;
     color: white;
-    padding: 8px 24px;
-    border-radius: 20px;
-    font-size: 14pt;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 10pt;
     font-weight: bold;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
   .print-score-handicap {
-    font-size: 11pt;
+    font-size: 9pt;
     color: #555;
-    margin-top: 5px;
+    margin-left: 10px;
   }
 
-  /* ===== CATEGORY BREAKDOWN SECTION ===== */
+  /* ===== COMPACT CATEGORY BREAKDOWN ===== */
   .print-categories {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     page-break-inside: avoid;
   }
 
@@ -1149,16 +1153,16 @@ input[type="number"]:focus {
     color: var(--report-indigo);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    margin: 0 0 12px 0;
-    font-size: 14pt;
+    margin: 0 0 8px 0;
+    font-size: 11pt;
     border-bottom: 2px solid var(--report-indigo);
-    padding-bottom: 6px;
+    padding-bottom: 4px;
   }
 
   .print-category-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 5px;
   }
 
   .print-category-table thead {
@@ -1168,9 +1172,9 @@ input[type="number"]:focus {
   }
 
   .print-category-table th {
-    padding: 10px;
+    padding: 6px 8px;
     text-align: left;
-    font-size: 10pt;
+    font-size: 9pt;
     font-weight: 600;
     color: #333;
     border-bottom: 2px solid var(--report-indigo);
@@ -1179,9 +1183,9 @@ input[type="number"]:focus {
   }
 
   .print-category-table td {
-    padding: 10px;
+    padding: 6px 8px;
     border-bottom: 1px solid #e0e0e0;
-    font-size: 10pt;
+    font-size: 9pt;
   }
 
   .print-category-table tbody tr:last-child td {
@@ -1193,12 +1197,12 @@ input[type="number"]:focus {
     color: var(--report-indigo);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    font-size: 12pt;
+    font-size: 10pt;
   }
 
   /* ===== PROFESSIONAL COMMENTS SECTION ===== */
   .print-comments {
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     page-break-inside: avoid;
   }
 
@@ -1206,21 +1210,21 @@ input[type="number"]:focus {
     color: var(--success-green);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    margin: 0 0 10px 0;
-    font-size: 14pt;
+    margin: 0 0 8px 0;
+    font-size: 11pt;
     border-bottom: 2px solid var(--success-green);
-    padding-bottom: 6px;
+    padding-bottom: 4px;
   }
 
   .print-comments-content {
     background: #fafafa;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    padding: 15px;
+    padding: 10px 12px;
     border-left: 3px solid var(--success-green);
-    min-height: 60px;
-    font-size: 10pt;
-    line-height: 1.6;
+    min-height: 40px;
+    font-size: 9pt;
+    line-height: 1.5;
     white-space: pre-wrap;
     word-wrap: break-word;
   }
@@ -1229,19 +1233,19 @@ input[type="number"]:focus {
     color: #999;
   }
 
-  /* ===== PROFESSIONAL FOOTER ===== */
+  /* ===== COMPACT PROFESSIONAL FOOTER ===== */
   .print-footer {
-    margin-top: 30px;
-    padding-top: 15px;
-    border-top: 2px solid #ddd;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
     text-align: center;
-    font-size: 8pt;
+    font-size: 7pt;
     color: #666;
     page-break-before: avoid;
   }
 
   .print-footer p {
-    margin: 3px 0;
+    margin: 2px 0;
   }
 
   .print-footer strong {
@@ -1252,7 +1256,7 @@ input[type="number"]:focus {
 
   /* ===== PAGE SETUP ===== */
   @page {
-    margin: 0.5in 0.6in;
+    margin: 0.4in 0.5in;
     size: letter portrait;
   }
 
@@ -1272,6 +1276,11 @@ input[type="number"]:focus {
   /* Better page breaks */
   h3 {
     page-break-after: avoid;
+  }
+
+  /* Allow comments to break across pages if needed */
+  .print-comments-content {
+    page-break-inside: auto;
   }
 }
 
