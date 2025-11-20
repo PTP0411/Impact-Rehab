@@ -560,12 +560,20 @@ input[type="number"]:focus {
 
 /* ==================== ASSESSMENT FORM STYLES ==================== */
 .assessment-form {
-  max-width: 1400px;
-  margin: 2rem auto;
+  width: 100vw;
+  margin: 0;
+  margin-left: calc(-50vw + 50%);
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 2rem;
-  padding: 2rem;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  padding: 0;
+  min-height: calc(100vh - 100px);
+}
+
+.assessment-form-content {
+  padding: 2rem 3rem;
+  background: var(--bg-white);
+  overflow-y: auto;
 }
 
 .test-grid {
@@ -621,19 +629,18 @@ input[type="number"]:focus {
   transform: none;
 }
 
-/* Real-time Score Display - Teal gradient */
+/* Real-time Score Display - Teal gradient - FIXED TO RIGHT */
 .score-display {
   position: sticky;
-  top: 20px;
+  top: 0;
+  right: 0;
   background: linear-gradient(135deg, var(--assessment-teal) 0%, var(--assessment-teal-dark) 100%);
   color: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
+  padding: 2rem 1.5rem;
   text-align: center;
-  height: fit-content;
-  max-height: calc(100vh - 40px);
+  height: 100vh;
   overflow-y: auto;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.1);
 }
 
 .score-display h3 {
@@ -1272,12 +1279,14 @@ input[type="number"]:focus {
 @media (max-width: 1024px) {
   .assessment-form {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 0;
+    width: 100%;
+    margin-left: 0;
   }
   
   .score-display {
     position: relative;
-    top: 0;
+    height: auto;
     max-height: none;
   }
   
