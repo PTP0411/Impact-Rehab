@@ -286,50 +286,61 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
     });
 
     // Save comments function
-    function saveComments() {
-      const comments = document.getElementById('doctor-comments').value;
-      const statusElement = document.getElementById('save-status');
-      const saveButton = document.querySelector('.btn-save-comments');
+function saveComments() {
+  const comments = document.getElementById('doctor-comments').value;
+  const statusElement = document.getElementById('save-status');
+  const saveButton = document.querySelector('.btn-save-comments');
+  
+  // Show loading state
+  saveButton.disabled = true;
+  saveButton.textContent = '💾 Saving...';
+  statusElement.textContent = '';
+  
+  // Send AJAX request
+  fetch('assessment_result.php?sid=<?php echo $session_id; ?>', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'action=save_comments&session_id=<?php echo $session_id; ?>&comments=' + encodeURIComponent(comments)
+  })
+  .then(response => response.json())
+  .then(data => {
+    saveButton.disabled = false;
+    saveButton.textContent = '💾 Save Comments';
+    
+    if (data.success) {
+      statusElement.textContent = '✓ Comments saved successfully';
+      statusElement.style.color = '#2e7d32';
       
-      // Show loading state
-      saveButton.disabled = true;
-      saveButton.textContent = '💾 Saving...';
-      statusElement.textContent = '';
-      
-      // Send AJAX request
-      fetch('assessment_result.php?sid=<?php echo $session_id; ?>', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=save_comments&session_id=<?php echo $session_id; ?>&comments=' + encodeURIComponent(comments)
-      })
-      .then(response => response.json())
-      .then(data => {
-        saveButton.disabled = false;
-        saveButton.textContent = '💾 Save Comments';
-        
-        if (data.success) {
-          statusElement.textContent = '✓ Comments saved successfully';
-          statusElement.style.color = '#2e7d32';
-          
-          // Clear success message after 3 seconds
-          setTimeout(() => {
-            statusElement.textContent = '';
-          }, 3000);
+      // UPDATE THE PRINT SECTION WITH NEW COMMENTS
+      const printCommentsContent = document.querySelector('.print-comments-content');
+      if (printCommentsContent) {
+        if (comments.trim() === '') {
+          printCommentsContent.innerHTML = '<em>No comments recorded for this assessment.</em>';
         } else {
-          statusElement.textContent = '✗ Error saving comments';
-          statusElement.style.color = '#d32f2f';
+          // Convert newlines to <br> tags for HTML display
+          printCommentsContent.innerHTML = comments.replace(/\n/g, '<br>');
         }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        saveButton.disabled = false;
-        saveButton.textContent = '💾 Save Comments';
-        statusElement.textContent = '✗ Error saving comments';
-        statusElement.style.color = '#d32f2f';
-      });
+      }
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        statusElement.textContent = '';
+      }, 3000);
+    } else {
+      statusElement.textContent = '✗ Error saving comments';
+      statusElement.style.color = '#d32f2f';
     }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    saveButton.disabled = false;
+    saveButton.textContent = '💾 Save Comments';
+    statusElement.textContent = '✗ Error saving comments';
+    statusElement.style.color = '#d32f2f';
+  });
+}
   </script>
 </body>
 </html>
