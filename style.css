@@ -1,57 +1,58 @@
-/* ==================== COLOR SCHEME VARIABLES ==================== */
+/* ==================== PROFESSIONAL COLOR SCHEME ==================== */
 :root {
-  /* Primary - Navigation & Main UI */
-  --primary-blue: #1976D2;
-  --primary-blue-light: #2196F3;
-  --primary-blue-bg: #E3F2FD;
+  /* Primary - Navigation & Main UI - Professional Navy */
+  --primary-blue: #2C5F87;
+  --primary-blue-light: #3D7199;
+  --primary-blue-dark: #1E4563;
+  --primary-blue-bg: #E8F1F7;
   
-  /* Sections */
-  --assessment-teal: #00ACC1;
-  --assessment-teal-dark: #00838F;
-  --assessment-teal-light: #B2EBF2;
+  /* Sections - Sophisticated Palette */
+  --assessment-teal: #3A7D8F;
+  --assessment-teal-dark: #2A6170;
+  --assessment-teal-light: #D4E8ED;
   
-  --patient-purple: #7E57C2;
-  --patient-purple-dark: #5E35B1;
-  --patient-purple-light: #E1BEE7;
+  --patient-purple: #6B7A9E;
+  --patient-purple-dark: #515F7F;
+  --patient-purple-light: #DFE3ED;
   
-  --report-indigo: #5C6BC0;
-  --report-indigo-dark: #3949AB;
-  --report-indigo-light: #C5CAE9;
+  --report-indigo: #4A6B8A;
+  --report-indigo-dark: #365170;
+  --report-indigo-light: #D9E3EB;
   
-  --action-orange: #FF9800;
-  --action-orange-dark: #F57C00;
-  --action-orange-light: #FFE0B2;
+  --action-orange: #C67D3A;
+  --action-orange-dark: #A46527;
+  --action-orange-light: #F0E1D0;
   
-  /* Semantic */
-  --success-green: #4CAF50;
-  --success-green-dark: #388E3C;
-  --success-green-light: #C8E6C9;
+  /* Semantic - Professional Medical Colors */
+  --success-green: #4A7C59;
+  --success-green-dark: #356344;
+  --success-green-light: #D8E8DD;
   
-  --warning-yellow: #FFC107;
-  --warning-yellow-dark: #FFA000;
-  --warning-yellow-light: #FFECB3;
+  --warning-yellow: #C9A03A;
+  --warning-yellow-dark: #A58028;
+  --warning-yellow-light: #F5EDD8;
   
-  --error-red: #E53935;
-  --error-red-dark: #C62828;
-  --error-red-light: #FFCDD2;
+  --error-red: #B5574D;
+  --error-red-dark: #93413A;
+  --error-red-light: #EDD9D7;
   
-  --info-blue: #2196F3;
-  --info-blue-dark: #1976D2;
-  --info-blue-light: #BBDEFB;
+  --info-blue: #4A7A9E;
+  --info-blue-dark: #355979;
+  --info-blue-light: #D9E5EE;
   
-  /* Neutrals */
-  --text-dark: #212121;
-  --text-medium: #757575;
-  --text-light: #BDBDBD;
+  /* Neutrals - Refined Grays */
+  --text-dark: #2A3640;
+  --text-medium: #6B7684;
+  --text-light: #A8B1BC;
   --bg-white: #FFFFFF;
-  --bg-light: #F5F5F5;
-  --bg-lighter: #FAFAFA;
-  --border-light: #E0E0E0;
+  --bg-light: #F7F8FA;
+  --bg-lighter: #FAFBFC;
+  --border-light: #DDE2E8;
   
-  /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
-  --shadow-lg: 0 8px 20px rgba(0,0,0,0.2);
+  /* Shadows - Subtle Professional */
+  --shadow-sm: 0 1px 3px rgba(42, 54, 64, 0.08);
+  --shadow-md: 0 3px 8px rgba(42, 54, 64, 0.12);
+  --shadow-lg: 0 6px 16px rgba(42, 54, 64, 0.15);
 }
 
 body {
@@ -367,12 +368,46 @@ input[type="number"]:focus {
   color: var(--patient-purple);
 }
 
+/* Update the header buttons section in your CSS */
 .header-buttons {
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;  
+}
+
+#back-to-form-btn,
+#back-to-dashboard-btn {
+  background: var(--text-dark);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+#back-to-form-btn:hover,
+#back-to-dashboard-btn:hover {
+  background: #424242;
+}
+
+/* Make sure old #back-btn still works if used elsewhere */
+#back-btn {
+  background: var(--text-dark);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+#back-btn:hover {
+  background: #424242;
 }
 
 /* ==================== PATIENT FORMS ==================== */
@@ -560,12 +595,20 @@ input[type="number"]:focus {
 
 /* ==================== ASSESSMENT FORM STYLES ==================== */
 .assessment-form {
-  max-width: 1400px;
-  margin: 2rem auto;
+  width: 100vw;
+  margin: 0;
+  margin-left: calc(-50vw + 50%);
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 2rem;
-  padding: 2rem;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  padding: 0;
+  min-height: calc(100vh - 100px);
+}
+
+.assessment-form-content {
+  padding: 2rem 3rem;
+  background: var(--bg-white);
+  overflow-y: auto;
 }
 
 .test-grid {
@@ -621,19 +664,18 @@ input[type="number"]:focus {
   transform: none;
 }
 
-/* Real-time Score Display - Teal gradient */
+/* Real-time Score Display - Teal gradient  */
 .score-display {
   position: sticky;
-  top: 20px;
+  top: 0;
+  right: 0;
   background: linear-gradient(135deg, var(--assessment-teal) 0%, var(--assessment-teal-dark) 100%);
   color: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
+  padding: 2rem 1.5rem;
   text-align: center;
-  height: fit-content;
-  max-height: calc(100vh - 40px);
+  height: 100vh;
   overflow-y: auto;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.1);
 }
 
 .score-display h3 {
@@ -815,7 +857,7 @@ input[type="number"]:focus {
   font-size: 1rem;
 }
 
-.score-info .handicap {
+.score-info .assessment-date {
   color: var(--text-medium);
   font-size: 0.95rem;
 }
@@ -894,7 +936,7 @@ input[type="number"]:focus {
   border-left: 4px solid var(--report-indigo);
 }
 
-/* Doctor Comments Section - Success green accent */
+/* Doctor Comments Section  */
 .comments-section {
   background: var(--bg-white);
   padding: 2rem;
@@ -955,7 +997,8 @@ input[type="number"]:focus {
 .print-patient-summary,
 .print-score-summary,
 .print-categories,
-.print-comments {
+.print-comments,
+.print-detailed-scores {
   display: none;
 }
 
@@ -971,29 +1014,30 @@ input[type="number"]:focus {
     background: white;
     margin: 0;
     padding: 0;
-    font-size: 11pt;
-    line-height: 1.4;
+    font-size: 10pt;
+    line-height: 1.3;
     color: #000;
   }
 
   /* ===== HIDE SCREEN-ONLY ELEMENTS ===== */
   header, 
   .action-buttons,
-  .scores-section,
   .score-card,
   .patient-header,
   .comments-section,
+  .scores-section,   
   .btn-save-comments,
   .save-status,
   #back-btn {
     display: none !important;
-  }
+}
 
   /* ===== SHOW PRINT-ONLY ELEMENTS ===== */
   .print-header,
   .print-patient-summary,
   .print-score-summary,
   .print-categories,
+  .print-detailed-scores,
   .print-comments,
   .print-footer {
     display: block !important;
@@ -1002,14 +1046,17 @@ input[type="number"]:focus {
   .results-container {
     max-width: 100%;
     margin: 0;
-    padding: 0.5in;
+    padding: 0.4in 0.5in;
   }
 
-  /* ===== PROFESSIONAL HEADER ===== */
+  /* ===== COMPACT PROFESSIONAL HEADER ===== */
   .print-header {
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 3px solid var(--primary-blue);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-blue);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
@@ -1017,48 +1064,49 @@ input[type="number"]:focus {
   .print-logo h1 {
     color: var(--primary-blue);
     margin: 0;
-    font-size: 28pt;
+    font-size: 18pt;
     font-weight: bold;
-    letter-spacing: -0.5px;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
   .print-subtitle {
-    margin: 3px 0 15px 0;
+    margin: 2px 0 0 0;
     color: #666;
-    font-size: 11pt;
+    font-size: 9pt;
     font-style: italic;
   }
 
   .print-document-title h2 {
-    margin: 8px 0 3px 0;
-    font-size: 20pt;
+    margin: 0;
+    font-size: 14pt;
     color: #333;
     font-weight: bold;
+    text-align: right;
   }
 
   .print-document-title p {
-    margin: 0;
+    margin: 2px 0 0 0;
     color: #666;
-    font-size: 10pt;
+    font-size: 8pt;
+    text-align: right;
   }
 
-  /* ===== PATIENT SUMMARY SECTION ===== */
+  /* ===== COMPACT PATIENT SUMMARY ===== */
   .print-patient-summary {
     background: #f8f8f8;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border-left: 4px solid var(--report-indigo);
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border-left: 3px solid var(--report-indigo);
     page-break-inside: avoid;
   }
 
   .print-summary-row {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 15px;
   }
 
   .print-summary-item {
@@ -1068,41 +1116,41 @@ input[type="number"]:focus {
   .print-label {
     font-weight: 600;
     color: #555;
-    font-size: 9pt;
+    font-size: 8pt;
     display: block;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
   }
 
   .print-value {
-    font-size: 11pt;
+    font-size: 10pt;
     color: #000;
     font-weight: 500;
   }
 
-  /* ===== SCORE SUMMARY SECTION ===== */
+  /* ===== COMPACT SCORE SUMMARY - INLINE LAYOUT ===== */
   .print-score-summary {
-    background: linear-gradient(135deg, #E8F5FE 0%, #ffffff 100%);
+    background: #f0f7fb;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 2px solid var(--report-indigo);
-    border-radius: 8px;
-    text-align: center;
+    padding: 10px 15px;
+    margin-bottom: 12px;
+    border-left: 3px solid var(--report-indigo);
     page-break-inside: avoid;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .print-score-main {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
   }
 
   .print-score-number {
-    font-size: 48pt;
+    font-size: 28pt;
     font-weight: bold;
     color: var(--report-indigo);
     print-color-adjust: exact;
@@ -1111,30 +1159,24 @@ input[type="number"]:focus {
   }
 
   .print-score-total {
-    font-size: 24pt;
+    font-size: 14pt;
     color: #999;
   }
 
   .print-score-tier {
     display: inline-block;
     color: white;
-    padding: 8px 24px;
-    border-radius: 20px;
-    font-size: 14pt;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 10pt;
     font-weight: bold;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
-  .print-score-handicap {
-    font-size: 11pt;
-    color: #555;
-    margin-top: 5px;
-  }
-
-  /* ===== CATEGORY BREAKDOWN SECTION ===== */
+  /* ===== COMPACT CATEGORY BREAKDOWN ===== */
   .print-categories {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     page-break-inside: avoid;
   }
 
@@ -1142,16 +1184,16 @@ input[type="number"]:focus {
     color: var(--report-indigo);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    margin: 0 0 12px 0;
-    font-size: 14pt;
+    margin: 0 0 8px 0;
+    font-size: 11pt;
     border-bottom: 2px solid var(--report-indigo);
-    padding-bottom: 6px;
+    padding-bottom: 4px;
   }
 
   .print-category-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 5px;
   }
 
   .print-category-table thead {
@@ -1161,9 +1203,9 @@ input[type="number"]:focus {
   }
 
   .print-category-table th {
-    padding: 10px;
+    padding: 6px 8px;
     text-align: left;
-    font-size: 10pt;
+    font-size: 9pt;
     font-weight: 600;
     color: #333;
     border-bottom: 2px solid var(--report-indigo);
@@ -1172,9 +1214,9 @@ input[type="number"]:focus {
   }
 
   .print-category-table td {
-    padding: 10px;
+    padding: 6px 8px;
     border-bottom: 1px solid #e0e0e0;
-    font-size: 10pt;
+    font-size: 9pt;
   }
 
   .print-category-table tbody tr:last-child td {
@@ -1186,12 +1228,12 @@ input[type="number"]:focus {
     color: var(--report-indigo);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    font-size: 12pt;
+    font-size: 10pt;
   }
 
   /* ===== PROFESSIONAL COMMENTS SECTION ===== */
   .print-comments {
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     page-break-inside: avoid;
   }
 
@@ -1199,21 +1241,21 @@ input[type="number"]:focus {
     color: var(--success-green);
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    margin: 0 0 10px 0;
-    font-size: 14pt;
+    margin: 0 0 8px 0;
+    font-size: 11pt;
     border-bottom: 2px solid var(--success-green);
-    padding-bottom: 6px;
+    padding-bottom: 4px;
   }
 
   .print-comments-content {
     background: #fafafa;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
-    padding: 15px;
+    padding: 10px 12px;
     border-left: 3px solid var(--success-green);
-    min-height: 60px;
-    font-size: 10pt;
-    line-height: 1.6;
+    min-height: 40px;
+    font-size: 9pt;
+    line-height: 1.5;
     white-space: pre-wrap;
     word-wrap: break-word;
   }
@@ -1222,19 +1264,19 @@ input[type="number"]:focus {
     color: #999;
   }
 
-  /* ===== PROFESSIONAL FOOTER ===== */
+  /* ===== COMPACT PROFESSIONAL FOOTER ===== */
   .print-footer {
-    margin-top: 30px;
-    padding-top: 15px;
-    border-top: 2px solid #ddd;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
     text-align: center;
-    font-size: 8pt;
+    font-size: 7pt;
     color: #666;
     page-break-before: avoid;
   }
 
   .print-footer p {
-    margin: 3px 0;
+    margin: 2px 0;
   }
 
   .print-footer strong {
@@ -1245,7 +1287,7 @@ input[type="number"]:focus {
 
   /* ===== PAGE SETUP ===== */
   @page {
-    margin: 0.5in 0.6in;
+    margin: 0.4in 0.5in;
     size: letter portrait;
   }
 
@@ -1258,6 +1300,7 @@ input[type="number"]:focus {
   /* Prevent page breaks inside critical sections */
   .print-score-summary,
   .print-categories,
+  .print-detailed-scores,
   .print-comments {
     page-break-inside: avoid;
   }
@@ -1266,18 +1309,25 @@ input[type="number"]:focus {
   h3 {
     page-break-after: avoid;
   }
+
+  /* Allow comments to break across pages if needed */
+  .print-comments-content {
+    page-break-inside: auto;
+  }
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 @media (max-width: 1024px) {
   .assessment-form {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 0;
+    width: 100%;
+    margin-left: 0;
   }
   
   .score-display {
     position: relative;
-    top: 0;
+    height: auto;
     max-height: none;
   }
   

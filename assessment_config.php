@@ -2,9 +2,9 @@
 // assessment_config.php
 
 /**
- * Get all HumanTrak test definitions
+ * Get all Movement test definitions
  */
-function getHumanTrakTests() {
+function getMovementTests() {
     return [
         ['ex1', 'Standing Posture', [
             5 => '5 - Ideal alignment',
@@ -138,9 +138,9 @@ function getHumanTrakTests() {
 }
 
 /**
- * Get all Dynamo test definitions
+ * Get all Grip Strength test definitions
  */
-function getDynamoTests() {
+function getGripStrengthTests() {
     return [
         ['ex17', 'Grip Strength', [
             5 => '5 - 90-100th percentile',
@@ -154,9 +154,9 @@ function getDynamoTests() {
 }
 
 /**
- * Get all ForceDecks test definitions
+ * Get all Balance and Power test definitions
  */
-function getForceDecksTests() {
+function getBalanceAndPowerTests() {
     return [
         ['ex18', 'Quiet Stand EO', [
             5 => '5 - Excellent', 4 => '4 - Good', 3 => '3 - Fair',

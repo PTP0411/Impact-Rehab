@@ -35,8 +35,7 @@ function processLogin($db, $formData) {
         $_SESSION['email'] = $row['email'];
         $_SESSION["valid"] = true;
         
-        echo "<p style='color: green; text-align: center; margin-top: 1rem;'>✓ Login successful! Redirecting...</p>";
-        header('refresh:1;url=doctor.php');
+        header('Location: doctor.php');
         exit();
     }
     else {
@@ -45,20 +44,6 @@ function processLogin($db, $formData) {
 }
 
 // ==================== MSK ASSESSMENT FUNCTIONS ====================
-
-/**
- * Get performance tier information based on MSK score
- * @param float $score - MSK score out of 100
- * @return array - [tier_name, handicap_range, color_hex]
- */
-function getPerformanceTier($score) {
-    if ($score >= 90) return ["Elite", "0.1+", "#2e7d32"];
-    if ($score >= 80) return ["Competitive", "0-5", "#388e3c"];
-    if ($score >= 70) return ["Athletic", "6-10", "#66bb6a"];
-    if ($score >= 60) return ["Functional", "11-15", "#fbc02d"];
-    if ($score >= 50) return ["Recreational", "16-20", "#f57c00"];
-    return ["At Risk", "20+", "#d32f2f"];
-}
 
 /**
  * Calculate average percentage for a category of scores
@@ -119,13 +104,13 @@ function getSessionScores($db, $session_id) {
 /**
  * Group scores by assessment category
  * @param array $all_scores - All scores from session
- * @return array - Associative array with 'humanTrak', 'dynamo', 'forceDecks' keys
+ * @return array - Associative array with 'movement', 'gripStrength', 'balanceAndPower' keys
  */
 function groupScoresByCategory($all_scores) {
     return [
-        'humanTrak' => array_slice($all_scores, 0, 16),
-        'dynamo' => array_slice($all_scores, 16, 1),
-        'forceDecks' => array_slice($all_scores, 17, 8)
+        'movement' => array_slice($all_scores, 0, 16),
+        'gripStrength' => array_slice($all_scores, 16, 1),
+        'balanceAndPower' => array_slice($all_scores, 17, 8)
     ];
 }
 
@@ -252,16 +237,16 @@ function renderScoreDisplay() {
       
       <div class="score-breakdown">
         <div class="score-category">
-          <div class="score-category-label">HumanTrak</div>
-          <div class="score-category-value"><span id="humantrak-score">0</span>%</div>
+          <div class="score-category-label">Movement</div>
+          <div class="score-category-value"><span id="movement-score">0</span>%</div>
         </div>
         <div class="score-category">
-          <div class="score-category-label">Dynamo</div>
-          <div class="score-category-value"><span id="dynamo-score">0</span>%</div>
+          <div class="score-category-label">Grip Strength</div>
+          <div class="score-category-value"><span id="grip-strength-score">0</span>%</div>
         </div>
         <div class="score-category">
-          <div class="score-category-label">ForceDecks</div>
-          <div class="score-category-value"><span id="forcedecks-score">0</span>%</div>
+          <div class="score-category-label">Balance and Power</div>
+          <div class="score-category-value"><span id="balance-power-score">0</span>%</div>
         </div>
       </div>
       
