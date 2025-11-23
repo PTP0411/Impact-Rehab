@@ -104,14 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    button {
-      background-color:rgb(24, 139, 39);
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    } <!-- Optional if using shared CSS -->
     .msg {
       padding: 10px;
       margin-bottom: 20px;
@@ -173,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea name="note" rows="3"></textarea>
       </label>
 
-      <button type="submit">Create Patient</button>
+      <button type="submit" class="btn-primary">Create Patient</button>
     </form>
   </main>
 
