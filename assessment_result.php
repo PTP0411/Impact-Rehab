@@ -63,7 +63,6 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
   <div class="print-header">
     <div class="print-logo">
       <h1>Impact Rehab</h1>
-      <p class="print-subtitle">Musculoskeletal Performance Center</p>
     </div>
     <div class="print-document-title">
       <h2>MSK Assessment Report</h2>
@@ -106,7 +105,6 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
       <div class="print-score-main">
         <div class="print-score-number"><?php echo $msk_score; ?><span class="print-score-total">/100</span></div>
         <div class="print-score-tier" style="background-color: <?php echo $color; ?>;"><?php echo $tier; ?></div>
-        <div class="print-score-handicap">Golf Handicap Equivalent: <?php echo $handicap; ?></div>
       </div>
     </div>
 
@@ -170,7 +168,6 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
         
         <div class="score-info">
           <div class="tier-badge" style="background: <?php echo $color; ?>;"><?php echo $tier; ?></div>
-          <p><strong>Golf Handicap Equivalent:</strong> <?php echo $handicap; ?></p>
           <p class="handicap">Assessment completed on <?php echo date('M d, Y', strtotime($session['session_date'])); ?></p>
         </div>
       </div>
@@ -249,7 +246,7 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
 
     <!-- Print-only footer -->
     <div class="print-footer">
-      <p><strong>Impact Rehab</strong> | Musculoskeletal Performance Center</p>
+      <p><strong>Impact Rehab</strong></p>
       <p>This report is confidential and intended for the patient and healthcare provider only.</p>
       <p>Report generated on <?php echo date('F d, Y \a\t g:i A'); ?></p>
     </div>
@@ -263,84 +260,86 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
   </main>
 
   <script>
-    const ctx = document.getElementById('scoreChart').getContext('2d');
-    const scoreChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Score', 'Remaining'],
-        datasets: [{
-          data: [<?php echo $msk_score; ?>, <?php echo 100 - $msk_score; ?>],
-          backgroundColor: ['<?php echo $color; ?>', '#e8e8e8'],
-          borderWidth: 0
-        }]
+  const ctx = document.getElementById('scoreChart').getContext('2d');
+  const scoreChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Remaining', 'Score'],
+      datasets: [{
+        data: [<?php echo 100 - $msk_score; ?>, <?php echo $msk_score; ?>],
+        backgroundColor: ['#e8e8e8', '<?php echo $color; ?>'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      rotation: -90,  // Start at top
+      circumference: 360,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: { enabled: false }
-        },
-        cutout: '75%'
-      }
-    });
+      cutout: '75%'
+    }
+  });
 
     // Save comments function
-function saveComments() {
-  const comments = document.getElementById('doctor-comments').value;
-  const statusElement = document.getElementById('save-status');
-  const saveButton = document.querySelector('.btn-save-comments');
-  
-  // Show loading state
-  saveButton.disabled = true;
-  saveButton.textContent = '💾 Saving...';
-  statusElement.textContent = '';
-  
-  // Send AJAX request
-  fetch('assessment_result.php?sid=<?php echo $session_id; ?>', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'action=save_comments&session_id=<?php echo $session_id; ?>&comments=' + encodeURIComponent(comments)
-  })
-  .then(response => response.json())
-  .then(data => {
-    saveButton.disabled = false;
-    saveButton.textContent = '💾 Save Comments';
-    
-    if (data.success) {
-      statusElement.textContent = '✓ Comments saved successfully';
-      statusElement.style.color = '#2e7d32';
+    function saveComments() {
+      const comments = document.getElementById('doctor-comments').value;
+      const statusElement = document.getElementById('save-status');
+      const saveButton = document.querySelector('.btn-save-comments');
       
-      // UPDATE THE PRINT SECTION WITH NEW COMMENTS
-      const printCommentsContent = document.querySelector('.print-comments-content');
-      if (printCommentsContent) {
-        if (comments.trim() === '') {
-          printCommentsContent.innerHTML = '<em>No comments recorded for this assessment.</em>';
+      // Show loading state
+      saveButton.disabled = true;
+      saveButton.textContent = '💾 Saving...';
+      statusElement.textContent = '';
+      
+      // Send AJAX request
+      fetch('assessment_result.php?sid=<?php echo $session_id; ?>', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=save_comments&session_id=<?php echo $session_id; ?>&comments=' + encodeURIComponent(comments)
+      })
+      .then(response => response.json())
+      .then(data => {
+        saveButton.disabled = false;
+        saveButton.textContent = '💾 Save Comments';
+        
+        if (data.success) {
+          statusElement.textContent = '✓ Comments saved successfully';
+          statusElement.style.color = '#2e7d32';
+          
+          // UPDATE THE PRINT SECTION WITH NEW COMMENTS
+          const printCommentsContent = document.querySelector('.print-comments-content');
+          if (printCommentsContent) {
+            if (comments.trim() === '') {
+              printCommentsContent.innerHTML = '<em>No comments recorded for this assessment.</em>';
+            } else {
+              // Convert newlines to <br> tags for HTML display
+              printCommentsContent.innerHTML = comments.replace(/\n/g, '<br>');
+            }
+          }
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            statusElement.textContent = '';
+          }, 3000);
         } else {
-          // Convert newlines to <br> tags for HTML display
-          printCommentsContent.innerHTML = comments.replace(/\n/g, '<br>');
+          statusElement.textContent = '✗ Error saving comments';
+          statusElement.style.color = '#d32f2f';
         }
-      }
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        statusElement.textContent = '';
-      }, 3000);
-    } else {
-      statusElement.textContent = '✗ Error saving comments';
-      statusElement.style.color = '#d32f2f';
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        saveButton.disabled = false;
+        saveButton.textContent = '💾 Save Comments';
+        statusElement.textContent = '✗ Error saving comments';
+        statusElement.style.color = '#d32f2f';
+      });
     }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    saveButton.disabled = false;
-    saveButton.textContent = '💾 Save Comments';
-    statusElement.textContent = '✗ Error saving comments';
-    statusElement.style.color = '#d32f2f';
-  });
-}
   </script>
 </body>
 </html>

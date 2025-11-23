@@ -35,14 +35,17 @@ function getAssessmentJavaScript() {
           if (exerciseNum >= categories.humanTrak.start && exerciseNum <= categories.humanTrak.end) {
             categoryScores.humanTrak.score += value;
             categoryScores.humanTrak.completed++;
-          } else if (exerciseNum >= categories.dynamo.start && exerciseNum <= categories.dynamo.end) {
+          } 
+          else if (exerciseNum >= categories.dynamo.start && exerciseNum <= categories.dynamo.end) {
             categoryScores.dynamo.score += value;
             categoryScores.dynamo.completed++;
-          } else if (exerciseNum >= categories.forceDecks.start && exerciseNum <= categories.forceDecks.end) {
+          } 
+          else if (exerciseNum >= categories.forceDecks.start && exerciseNum <= categories.forceDecks.end) {
             categoryScores.forceDecks.score += value;
             categoryScores.forceDecks.completed++;
           }
-        } else {
+        } 
+        else {
           select.classList.remove('filled');
         }
       });

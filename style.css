@@ -963,7 +963,8 @@ input[type="number"]:focus {
 .print-patient-summary,
 .print-score-summary,
 .print-categories,
-.print-comments {
+.print-comments,
+.print-detailed-scores {
   display: none;
 }
 
@@ -987,21 +988,22 @@ input[type="number"]:focus {
   /* ===== HIDE SCREEN-ONLY ELEMENTS ===== */
   header, 
   .action-buttons,
-  .scores-section,
   .score-card,
   .patient-header,
   .comments-section,
+  .scores-section,   
   .btn-save-comments,
   .save-status,
   #back-btn {
     display: none !important;
-  }
+}
 
   /* ===== SHOW PRINT-ONLY ELEMENTS ===== */
   .print-header,
   .print-patient-summary,
   .print-score-summary,
   .print-categories,
+  .print-detailed-scores,
   .print-comments,
   .print-footer {
     display: block !important;
@@ -1138,12 +1140,6 @@ input[type="number"]:focus {
     -webkit-print-color-adjust: exact;
   }
 
-  .print-score-handicap {
-    font-size: 9pt;
-    color: #555;
-    margin-left: 10px;
-  }
-
   /* ===== COMPACT CATEGORY BREAKDOWN ===== */
   .print-categories {
     margin-bottom: 12px;
@@ -1270,6 +1266,7 @@ input[type="number"]:focus {
   /* Prevent page breaks inside critical sections */
   .print-score-summary,
   .print-categories,
+  .print-detailed-scores,
   .print-comments {
     page-break-inside: avoid;
   }
