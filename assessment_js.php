@@ -9,18 +9,18 @@ function getAssessmentJavaScript() {
     const totalTests = 25;
 
     const categories = {
-      humanTrak: { start: 1, end: 16, maxScore: 80 },
-      dynamo: { start: 17, end: 17, maxScore: 5 },
-      forceDecks: { start: 18, end: 25, maxScore: 40 }
+      movement: { start: 1, end: 16, maxScore: 80 },
+      gripStrength: { start: 17, end: 17, maxScore: 5 },
+      balanceAndPower: { start: 18, end: 25, maxScore: 40 }
     };
 
     function calculateScores() {
       let totalScore = 0;
       let completedTests = 0;
       let categoryScores = {
-        humanTrak: { score: 0, completed: 0, total: 16 },
-        dynamo: { score: 0, completed: 0, total: 1 },
-        forceDecks: { score: 0, completed: 0, total: 8 }
+        movement: { score: 0, completed: 0, total: 16 },
+        gripStrength: { score: 0, completed: 0, total: 1 },
+        balanceAndPower: { score: 0, completed: 0, total: 8 }
       };
       
       allSelects.forEach(select => {
@@ -32,17 +32,17 @@ function getAssessmentJavaScript() {
           totalScore += value;
           select.classList.add('filled');
           
-          if (exerciseNum >= categories.humanTrak.start && exerciseNum <= categories.humanTrak.end) {
-            categoryScores.humanTrak.score += value;
-            categoryScores.humanTrak.completed++;
+          if (exerciseNum >= categories.movement.start && exerciseNum <= categories.movement.end) {
+            categoryScores.movement.score += value;
+            categoryScores.movement.completed++;
           } 
-          else if (exerciseNum >= categories.dynamo.start && exerciseNum <= categories.dynamo.end) {
-            categoryScores.dynamo.score += value;
-            categoryScores.dynamo.completed++;
+          else if (exerciseNum >= categories.gripStrength.start && exerciseNum <= categories.gripStrength.end) {
+            categoryScores.gripStrength.score += value;
+            categoryScores.gripStrength.completed++;
           } 
-          else if (exerciseNum >= categories.forceDecks.start && exerciseNum <= categories.forceDecks.end) {
-            categoryScores.forceDecks.score += value;
-            categoryScores.forceDecks.completed++;
+          else if (exerciseNum >= categories.balanceAndPower.start && exerciseNum <= categories.balanceAndPower.end) {
+            categoryScores.balanceAndPower.score += value;
+            categoryScores.balanceAndPower.completed++;
           }
         } 
         else {
@@ -56,22 +56,22 @@ function getAssessmentJavaScript() {
         overallPercentage = ((totalScore / maxPossibleForCompleted) * 100).toFixed(1);
       }
       
-      const humanTrakPercentage = categoryScores.humanTrak.completed > 0 
-        ? ((categoryScores.humanTrak.score / (categoryScores.humanTrak.completed * 5)) * 100).toFixed(0)
+      const movementPercentage = categoryScores.movement.completed > 0 
+        ? ((categoryScores.movement.score / (categoryScores.movement.completed * 5)) * 100).toFixed(0)
         : 0;
         
-      const dynamoPercentage = categoryScores.dynamo.completed > 0
-        ? ((categoryScores.dynamo.score / (categoryScores.dynamo.completed * 5)) * 100).toFixed(0)
+      const gripStrengthPercentage = categoryScores.gripStrength.completed > 0
+        ? ((categoryScores.gripStrength.score / (categoryScores.gripStrength.completed * 5)) * 100).toFixed(0)
         : 0;
         
-      const forceDecksPercentage = categoryScores.forceDecks.completed > 0
-        ? ((categoryScores.forceDecks.score / (categoryScores.forceDecks.completed * 5)) * 100).toFixed(0)
+      const balanceAndPowerPercentage = categoryScores.balanceAndPower.completed > 0
+        ? ((categoryScores.balanceAndPower.score / (categoryScores.balanceAndPower.completed * 5)) * 100).toFixed(0)
         : 0;
       
       document.getElementById('current-score').textContent = overallPercentage;
-      document.getElementById('humantrak-score').textContent = humanTrakPercentage;
-      document.getElementById('dynamo-score').textContent = dynamoPercentage;
-      document.getElementById('forcedecks-score').textContent = forceDecksPercentage;
+      document.getElementById('movement-score').textContent = movementPercentage;
+      document.getElementById('grip-strength-score').textContent = gripStrengthPercentage;
+      document.getElementById('balance-power-score').textContent = balanceAndPowerPercentage;
       
       const completionPercentage = (completedTests / totalTests) * 100;
       document.getElementById('completion-fill').style.width = completionPercentage + '%';
@@ -105,22 +105,22 @@ function getAssessmentJavaScript() {
       let tier, color;
       
       if (score >= 90) {
-        tier = 'Elite (0.1+ Handicap)';
+        tier = 'Elite';
         color = '#2e7d32';
       } else if (score >= 80) {
-        tier = 'Competitive (0-5 Handicap)';
+        tier = 'Competitive';
         color = '#388e3c';
       } else if (score >= 70) {
-        tier = 'Athletic (6-10 Handicap)';
+        tier = 'Athletic';
         color = '#66bb6a';
       } else if (score >= 60) {
-        tier = 'Functional (11-15 Handicap)';
+        tier = 'Functional';
         color = '#fbc02d';
       } else if (score >= 50) {
-        tier = 'Recreational (16-20 Handicap)';
+        tier = 'Recreational';
         color = '#f57c00';
       } else {
-        tier = 'At Risk (20+ Handicap)';
+        tier = 'At Risk';
         color = '#d32f2f';
       }
       

@@ -33,21 +33,42 @@ if (!$session) {
 // Extract data
 $patient_name = formatPatientName($session);
 $msk_score = round($session['msk_score'], 2);
-list($tier, $handicap, $color) = getPerformanceTier($msk_score);
+
+// Determine performance tier and color
+if ($msk_score >= 90) {
+    $tier = "Elite";
+    $color = "#2e7d32";
+} elseif ($msk_score >= 80) {
+    $tier = "Competitive";
+    $color = "#388e3c";
+} elseif ($msk_score >= 70) {
+    $tier = "Athletic";
+    $color = "#66bb6a";
+} elseif ($msk_score >= 60) {
+    $tier = "Functional";
+    $color = "#fbc02d";
+} elseif ($msk_score >= 50) {
+    $tier = "Recreational";
+    $color = "#f57c00";
+} else {
+    $tier = "At Risk";
+    $color = "#d32f2f";
+}
+
 $doctor_comments = isset($session['doctor_comments']) ? $session['doctor_comments'] : '';
 
 // Fetch and group scores
 $all_scores = getSessionScores($db, $session_id);
 $grouped_scores = groupScoresByCategory($all_scores);
 
-$humanTrakScores = $grouped_scores['humanTrak'];
-$dynamoScores = $grouped_scores['dynamo'];
-$forceDecksScores = $grouped_scores['forceDecks'];
+$movementScores = $grouped_scores['movement'];
+$gripStrengthScores = $grouped_scores['gripStrength'];
+$balanceAndPowerScores = $grouped_scores['balanceAndPower'];
 
 // Calculate category averages
-$humanTrakAvg = calculateCategoryAverage($humanTrakScores);
-$dynamoAvg = calculateCategoryAverage($dynamoScores);
-$forceDecksAvg = calculateCategoryAverage($forceDecksScores);
+$movementAvg = calculateCategoryAverage($movementScores);
+$gripStrengthAvg = calculateCategoryAverage($gripStrengthScores);
+$balanceAndPowerAvg = calculateCategoryAverage($balanceAndPowerScores);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,7 +93,10 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
 
   <header>
     <h1>MSK Assessment Results</h1>
-    <button id="back-btn" onclick="window.location.href='doctor.php'">← Back to Dashboard</button>
+    <div class="header-buttons">
+      <button id="back-to-form-btn" onclick="window.location.href='assessment_form.php?pid=<?php echo $session['pid']; ?>'">← Back to Form</button>
+      <button id="back-to-dashboard-btn" onclick="window.location.href='doctor.php'">← Back to Dashboard</button>
+    </div>
   </header>
 
   <main class="results-container">
@@ -121,19 +145,19 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
         </thead>
         <tbody>
           <tr>
-            <td>HumanTrak Assessment</td>
-            <td class="print-category-score"><?php echo $humanTrakAvg; ?>%</td>
-            <td><?php echo $humanTrakAvg >= 70 ? 'Good' : ($humanTrakAvg >= 50 ? 'Fair' : 'Needs Improvement'); ?></td>
+            <td>Movement Assessment</td>
+            <td class="print-category-score"><?php echo $movementAvg; ?>%</td>
+            <td><?php echo $movementAvg >= 70 ? 'Good' : ($movementAvg >= 50 ? 'Fair' : 'Needs Improvement'); ?></td>
           </tr>
           <tr>
-            <td>Dynamo Assessment</td>
-            <td class="print-category-score"><?php echo $dynamoAvg; ?>%</td>
-            <td><?php echo $dynamoAvg >= 70 ? 'Good' : ($dynamoAvg >= 50 ? 'Fair' : 'Needs Improvement'); ?></td>
+            <td>Grip Strength Assessment</td>
+            <td class="print-category-score"><?php echo $gripStrengthAvg; ?>%</td>
+            <td><?php echo $gripStrengthAvg >= 70 ? 'Good' : ($gripStrengthAvg >= 50 ? 'Fair' : 'Needs Improvement'); ?></td>
           </tr>
           <tr>
-            <td>ForceDecks Assessment</td>
-            <td class="print-category-score"><?php echo $forceDecksAvg; ?>%</td>
-            <td><?php echo $forceDecksAvg >= 70 ? 'Good' : ($forceDecksAvg >= 50 ? 'Fair' : 'Needs Improvement'); ?></td>
+            <td>Balance and Power Assessment</td>
+            <td class="print-category-score"><?php echo $balanceAndPowerAvg; ?>%</td>
+            <td><?php echo $balanceAndPowerAvg >= 70 ? 'Good' : ($balanceAndPowerAvg >= 50 ? 'Fair' : 'Needs Improvement'); ?></td>
           </tr>
         </tbody>
       </table>
@@ -168,7 +192,7 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
         
         <div class="score-info">
           <div class="tier-badge" style="background: <?php echo $color; ?>;"><?php echo $tier; ?></div>
-          <p class="handicap">Assessment completed on <?php echo date('M d, Y', strtotime($session['session_date'])); ?></p>
+          <p class="assessment-date">Assessment completed on <?php echo date('M d, Y', strtotime($session['session_date'])); ?></p>
         </div>
       </div>
     </div>
@@ -178,25 +202,25 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
       <h4>Assessment Category Breakdown</h4>
       <div class="summary-grid">
         <div class="summary-item">
-          <div class="label">HumanTrak</div>
-          <div class="value"><?php echo $humanTrakAvg; ?>%</div>
+          <div class="label">Movement</div>
+          <div class="value"><?php echo $movementAvg; ?>%</div>
         </div>
         <div class="summary-item">
-          <div class="label">Dynamo</div>
-          <div class="value"><?php echo $dynamoAvg; ?>%</div>
+          <div class="label">Grip Strength</div>
+          <div class="value"><?php echo $gripStrengthAvg; ?>%</div>
         </div>
         <div class="summary-item">
-          <div class="label">ForceDecks</div>
-          <div class="value"><?php echo $forceDecksAvg; ?>%</div>
+          <div class="label">Balance and Power</div>
+          <div class="value"><?php echo $balanceAndPowerAvg; ?>%</div>
         </div>
       </div>
     </div>
 
-    <!-- HumanTrak Scores -->
+    <!-- Movement Scores -->
     <div class="scores-section">
-      <h3>🏃 HumanTrak Assessment</h3>
+      <h3>🏃 Movement Assessment</h3>
       <div class="score-grid">
-        <?php foreach ($humanTrakScores as $item): ?>
+        <?php foreach ($movementScores as $item): ?>
           <div class="score-item">
             <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
             <span class="value"><?php echo $item['score']; ?>/5</span>
@@ -205,11 +229,11 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
       </div>
     </div>
 
-    <!-- Dynamo Scores -->
+    <!-- Grip Strength Scores -->
     <div class="scores-section">
-      <h3>💪 Dynamo Assessment</h3>
+      <h3>💪 Grip Strength Assessment</h3>
       <div class="score-grid">
-        <?php foreach ($dynamoScores as $item): ?>
+        <?php foreach ($gripStrengthScores as $item): ?>
           <div class="score-item">
             <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
             <span class="value"><?php echo $item['score']; ?>/5</span>
@@ -218,11 +242,11 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
       </div>
     </div>
 
-    <!-- ForceDecks Scores -->
+    <!-- Balance and Power Scores -->
     <div class="scores-section">
-      <h3>⚡ ForceDecks Assessment</h3>
+      <h3>⚡ Balance and Power Assessment</h3>
       <div class="score-grid">
-        <?php foreach ($forceDecksScores as $item): ?>
+        <?php foreach ($balanceAndPowerScores as $item): ?>
           <div class="score-item">
             <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
             <span class="value"><?php echo $item['score']; ?>/5</span>

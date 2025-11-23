@@ -51,13 +51,13 @@ $patient_name = formatPatientName($patient);
           <input type="hidden" name="doctor_id" value="<?php echo $_SESSION['uid']; ?>">
 
           <!-- Movement Section -->
-          <?php echo renderTestSection('Movement Assessment', '🏃', getHumanTrakTests()); ?>
+          <?php echo renderTestSection('Movement Assessment', '🏃', getMovementTests()); ?>
 
           <!-- Grip Strength Section -->
-          <?php echo renderTestSection('Grip Strength Assessment', '💪', getDynamoTests()); ?>
+          <?php echo renderTestSection('Grip Strength Assessment', '💪', getGripStrengthTests()); ?>
 
           <!-- Balance and Power Section -->
-          <?php echo renderTestSection('Balance and Power Assessment', '⚡', getForceDecksTests()); ?>
+          <?php echo renderTestSection('Balance and Power Assessment', '⚡', getBalanceAndPowerTests()); ?>
 
           <!-- Buttons -->
           <div class="button-group">
