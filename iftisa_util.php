@@ -35,8 +35,7 @@ function processLogin($db, $formData) {
         $_SESSION['email'] = $row['email'];
         $_SESSION["valid"] = true;
         
-        echo "<p style='color: green; text-align: center; margin-top: 1rem;'>✓ Login successful! Redirecting...</p>";
-        header('refresh:1;url=doctor.php');
+        header('Location: doctor.php');
         exit();
     }
     else {
