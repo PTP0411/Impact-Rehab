@@ -1,6 +1,7 @@
 <?php 
 session_start();
 include_once("iftisa_util.php"); 
+include_once("olsen_util.php"); 
 include_once("connect.php"); // Make sure to include database connection
 
 // Check if already logged in
@@ -36,10 +37,13 @@ if (isset($_SESSION['valid']) && $_SESSION['valid'] === true) {
       genLoginForm();
       ?>
       
-      <p class="signup-text">New doctor? <a href="#">Register here</a></p>
+      <p class="signup-text">
+        Forgot your password? <a href="resetPass.php">Reset it here</a>
+      </p>
       <div class="back-link">
-        <a href="index.html">← Back to Sandbox</a>
+        <a href="./">← Back to Sandbox</a>
       </div>
+
     </div>
   </main>
 </body>
