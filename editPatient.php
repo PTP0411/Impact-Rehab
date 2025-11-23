@@ -92,20 +92,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       display: flex;
       justify-content: space-between;
     }
-    .save-btn, .cancel-btn {
+    .btn-primary, .btn-cancel {
       padding: 10px 16px;
       font-size: 16px;
       cursor: pointer;
       border: none;
       border-radius: 5px;
-    }
-    .save-btn {
-      background-color: #7ab92f;
-      color: white;
-    }
-    .cancel-btn {
-      background-color: #ccc;
-      color: black;
     }
     .error {
       color: red;
@@ -137,8 +129,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <textarea id="note" name="note"><?php echo htmlspecialchars($patient['note']); ?></textarea>
 
       <div class="form-buttons">
-        <button type="submit" class="save-btn">Save Changes</button>
-        <button type="button" class="cancel-btn" id="cancel-btn">Cancel</button>
+        <button type="submit" class="btn-primary">Save Changes</button>
+        <button type="button" class="btn-cancel" id="btn-cancel">Cancel</button>
       </div>
     </form>
   </main>
@@ -147,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     document.getElementById("back-btn").addEventListener("click", () => {
       window.location.href = "patientInfo.php?pid=<?php echo $pid; ?>";
     });
-    document.getElementById("cancel-btn").addEventListener("click", () => {
+    document.getElementById("btn-cancel").addEventListener("click", () => {
       window.location.href = "patientInfo.php?pid=<?php echo $pid; ?>";
     });
   </script>
