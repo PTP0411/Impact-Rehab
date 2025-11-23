@@ -72,7 +72,7 @@ $doctors = $db->query("
 <body>
   <header>
     <h1>Reassign Doctor for <?php echo htmlspecialchars($patient['name']); ?></h1>
-    <button onclick="window.location.href='patientInfo.php?pid=<?php echo $pid; ?>'">← Back to Patient</button>
+    <button id="back-btn" onclick="window.location.href='patientInfo.php?pid=<?php echo $pid; ?>'">← Back to Patient</button>
   </header>
 
   <main>
