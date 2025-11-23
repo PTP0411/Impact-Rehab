@@ -1,8 +1,8 @@
 <?php
-    $server = "cray.cs.gettysburg.edu";
-    $dbase = "f25_impact";
-    $user = "iftisa01";
-    $pass = "iftisa01";
+    $server = "";
+    $dbase = "";
+    $user = "";
+    $pass = "";
     $dsn = "mysql:host=$server;dbname=$dbase";  
     $options = [  PDO::ATTR_ERRMODE              => PDO::ERRMODE_EXCEPTION,
                   PDO::ATTR_DEFAULT_FETCH_MODE    => PDO::FETCH_ASSOC ];
