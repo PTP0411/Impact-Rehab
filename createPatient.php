@@ -72,25 +72,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Create New Patient</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f4f4f4;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
     h1 {
       margin: 0;
     }
     form {
-      background: white;
-      padding: 20px;
+      max-width: 600px;
+      margin: 30px auto;
+      background: #f9f9f9;
+      padding: 20px 30px;
       border-radius: 8px;
-      max-width: 500px;
-      margin-top: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     label {
       display: block;
@@ -111,14 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     .success { background-color: #d4edda; color: #155724; }
     .error { background-color: #f8d7da; color: #721c24; }
-    #back-btn {
-      background: #ccc;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 4px;
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
