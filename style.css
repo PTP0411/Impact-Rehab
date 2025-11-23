@@ -374,7 +374,7 @@ input[type="number"]:focus {
   top: 1.5rem;
   right: 1.5rem;
   display: flex;
-  gap: 0.75rem;  /* This creates the gap between buttons */
+  gap: 0.75rem;  
 }
 
 #back-to-form-btn,
@@ -664,7 +664,7 @@ input[type="number"]:focus {
   transform: none;
 }
 
-/* Real-time Score Display - Teal gradient - FIXED TO RIGHT */
+/* Real-time Score Display - Teal gradient  */
 .score-display {
   position: sticky;
   top: 0;
@@ -936,7 +936,7 @@ input[type="number"]:focus {
   border-left: 4px solid var(--report-indigo);
 }
 
-/* Doctor Comments Section - Success green accent */
+/* Doctor Comments Section  */
 .comments-section {
   background: var(--bg-white);
   padding: 2rem;
