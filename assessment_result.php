@@ -196,43 +196,50 @@ $forceDecksAvg = calculateCategoryAverage($forceDecksScores);
     </div>
 
     <!-- HumanTrak Scores -->
-    <div class="scores-section">
-      <h3>🏃 HumanTrak Assessment</h3>
-      <div class="score-grid">
-        <?php foreach ($humanTrakScores as $item): ?>
-          <div class="score-item">
-            <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
-            <span class="value"><?php echo $item['score']; ?>/5</span>
-          </div>
-        <?php endforeach; ?>
+<div class="scores-section">
+  <h3>🏃 HumanTrak Assessment</h3>
+  <div class="score-grid">
+    <?php foreach ($humanTrakScores as $item): 
+        $fivePoint = convertRawToFivePoint($item['eid'], $item['score']);
+    ?>
+      <div class="score-item">
+        <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
+        <span class="value"><?php echo $fivePoint; ?>/5 (<?php echo $item['score']; ?>)</span>
       </div>
-    </div>
+    <?php endforeach; ?>
+  </div>
+</div>
 
-    <!-- Dynamo Scores -->
-    <div class="scores-section">
-      <h3>💪 Dynamo Assessment</h3>
-      <div class="score-grid">
-        <?php foreach ($dynamoScores as $item): ?>
-          <div class="score-item">
-            <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
-            <span class="value"><?php echo $item['score']; ?>/5</span>
-          </div>
-        <?php endforeach; ?>
+<!-- Dynamo Scores -->
+<div class="scores-section">
+  <h3>💪 Dynamo Assessment</h3>
+  <div class="score-grid">
+    <?php foreach ($dynamoScores as $item): 
+        $fivePoint = convertRawToFivePoint($item['eid'], $item['score']);
+    ?>
+      <div class="score-item">
+        <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
+        <span class="value"><?php echo $fivePoint; ?>/5 (<?php echo $item['score']; ?>)</span>
       </div>
-    </div>
+    <?php endforeach; ?>
+  </div>
+</div>
 
-    <!-- ForceDecks Scores -->
-    <div class="scores-section">
-      <h3>⚡ ForceDecks Assessment</h3>
-      <div class="score-grid">
-        <?php foreach ($forceDecksScores as $item): ?>
-          <div class="score-item">
-            <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
-            <span class="value"><?php echo $item['score']; ?>/5</span>
-          </div>
-        <?php endforeach; ?>
+<!-- ForceDecks Scores -->
+<div class="scores-section">
+  <h3>⚡ ForceDecks Assessment</h3>
+  <div class="score-grid">
+    <?php foreach ($forceDecksScores as $item): 
+        $fivePoint = convertRawToFivePoint($item['eid'], $item['score']);
+    ?>
+      <div class="score-item">
+        <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
+        <span class="value"><?php echo $fivePoint; ?>/5 (<?php echo $item['score']; ?>)</span>
       </div>
-    </div>
+    <?php endforeach; ?>
+  </div>
+</div>
+
 
     <!-- Doctor Comments Section -->
     <div class="comments-section">

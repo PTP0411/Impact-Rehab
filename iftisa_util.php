@@ -67,14 +67,18 @@ function getPerformanceTier($score) {
  */
 function calculateCategoryAverage($scores) {
     if (empty($scores)) return 0;
-    
+
     $total = 0;
     foreach ($scores as $score) {
-        $total += $score['score'];
+        // Convert raw score to 5-point scale
+        $fivePoint = convertRawToFivePoint($score['eid'], $score['score']);
+        $total += $fivePoint;
     }
-    
+
+    // Average as percentage of max possible (5 points per test)
     return round(($total / (count($scores) * 5)) * 100, 1);
 }
+
 
 /**
  * Fetch session data with patient information
@@ -103,7 +107,7 @@ function getSessionData($db, $session_id) {
  * @return array - Array of score records
  */
 function getSessionScores($db, $session_id) {
-    $scores_query = "SELECT e.name, sc.score 
+    $scores_query = "SELECT e.name, sc.score, e.eid 
                      FROM scores sc 
                      JOIN exercises e ON sc.eid = e.eid 
                      WHERE sc.sid = :sid 
@@ -122,12 +126,27 @@ function getSessionScores($db, $session_id) {
  * @return array - Associative array with 'humanTrak', 'dynamo', 'forceDecks' keys
  */
 function groupScoresByCategory($all_scores) {
-    return [
-        'humanTrak' => array_slice($all_scores, 0, 16),
-        'dynamo' => array_slice($all_scores, 16, 1),
-        'forceDecks' => array_slice($all_scores, 17, 8)
+    $categories = [
+        'humanTrak' => [],
+        'dynamo' => [],
+        'forceDecks' => []
     ];
+
+    foreach ($all_scores as $score) {
+        $eid = intval($score['eid']);
+
+        if ($eid >= 1 && $eid <= 16) {
+            $categories['humanTrak'][] = $score;
+        } elseif ($eid === 17) {
+            $categories['dynamo'][] = $score;
+        } elseif ($eid >= 18 && $eid <= 25) {
+            $categories['forceDecks'][] = $score;
+        }
+    }
+
+    return $categories;
 }
+
 
 /**
  * Fetch patient information by ID
@@ -157,6 +176,62 @@ function formatPatientName($patient) {
     return $patient['first_name'] . ' ' . $patient['last_name'];
 }
 
+
+
+ function convertRawToFivePoint($eid, $raw) {//-Matt O. was here
+    if ($raw === "" || $raw === null) return 0;
+    $raw = floatval($raw);
+
+    // scale100 rules
+    $scale100 = [
+        2 => [50,40,30,0],
+        3 => [50,40,30,0],
+        4 => [80,70,60,45],
+        5 => [170,155,140,120],
+        6 => [90,80,70,60],
+        7 => [90,80,70,60],
+        10 => [50,45,35,25],
+        15 => [45,40,30,0],
+        16 => [45,40,30,0],
+        17 => [90,70,50,30, 1],  // Grip percentile
+        22 => [90,70,50,30,1],  // CMJ
+        23 => [90,70,50,30,1],  // SQJ
+        24 => [90,80,70,0]     // SL Jump, last two thresholds optional
+    ];
+
+    // scale4 rules
+    $scale4 = [
+        25 => [4.0,3.0,2.5,2.0]
+    ];
+
+    if (isset($scale100[$eid])) {
+        $thresholds = $scale100[$eid];
+        list($t5,$t4,$t3,$t2) = $thresholds;
+        $t1 = isset($thresholds[4]) ? $thresholds[4] : null;
+
+        if ($raw >= $t5) return 5;
+        if ($raw >= $t4) return 4;
+        if ($raw >= $t3) return 3;
+        if ($raw >= $t2) return 2;
+        if ($t1 !== null && $raw >= $t1) return 1;
+        return 0;
+    }
+
+    if (isset($scale4[$eid])) {
+        list($t5,$t4,$t3,$t2) = $scale4[$eid];
+        if ($raw >= $t5) return 5;
+        if ($raw >= $t4) return 4;
+        if ($raw >= $t3) return 3;
+        if ($raw >= $t2) return 2;
+        return 1;
+    }
+
+    // default: dropdown/select input 0–5
+    if ($raw <= 5) return intval($raw);
+
+    return 0; // fallback
+}
+
 /**
  * Save assessment session and scores to database
  * @param PDO $db - Database connection
@@ -164,19 +239,22 @@ function formatPatientName($patient) {
  * @param array $scores - Array of exercise scores [exercise_id => score]
  * @return int|false - New session ID or false on failure
  */
-function saveAssessment($db, $patient_id, $scores) {
+ function saveAssessment($db, $patient_id, $scores) {
     try {
         $db->beginTransaction();
         
         // Calculate MSK score based on completed tests only
-        $total_score = array_sum($scores);
+        $total_score = 0;
+        foreach ($scores as $eid => $raw_score) {
+            $five_point = convertRawToFivePoint($eid, $raw_score);
+            if ($five_point !== null) {
+                $total_score += $five_point;
+            }
+        }
         $completed_tests = count($scores);
-        $max_possible_score = $completed_tests * 5; // 5 points per test
-        
-        // Only calculate percentage if tests were completed
-        $percentage_score = $completed_tests > 0 
-            ? ($total_score / $max_possible_score) * 100 
-            : 0;
+        $max_possible_score = $completed_tests * 5;
+        $percentage_score = $completed_tests > 0 ? ($total_score/$max_possible_score)*100 : 0;
+
         
         // Insert session
         $session_query = "INSERT INTO sessions (pid, session_date, session_time, msk_score) 
@@ -212,6 +290,7 @@ function saveAssessment($db, $patient_id, $scores) {
     }
 }
 
+
 // ==================== ASSESSMENT FORM RENDERING FUNCTIONS ====================
 
 /**
@@ -221,25 +300,48 @@ function saveAssessment($db, $patient_id, $scores) {
  * @param array $options - Array of [value => description] pairs
  * @return string - HTML for the test item
  */
-function generateTestItem($exercise_id, $label, $options) {
-    $html = '<div class="test-item">';
+function generateTestItem($exercise_id, $label, $options, $type) {
+    $html  = '<div class="test-item">';
     $html .= '<label for="' . htmlspecialchars($exercise_id) . '">' . htmlspecialchars($label) . '</label>';
-    $html .= '<select name="scores[' . substr($exercise_id, 2) . ']" id="' . htmlspecialchars($exercise_id) . '">';
-    $html .= '<option value="">Select Score</option>';
 
-    foreach ($options as $value => $description) {
-        $html .= '<option value="' . $value . '">' . htmlspecialchars($description) . '</option>';
+    if ($type === 'scale100') {//max was gonna be 100, but changed to 360 since this is degrees of rotatons - Matt
+        $html .= '<input 
+                    type="number" 
+                    name="scores[' . substr($exercise_id, 2) . ']" 
+                    id="' . htmlspecialchars($exercise_id) . '" 
+                    min="0" 
+                    max="360"
+                    step="1" 
+                    placeholder="—"
+                    />';
+    } elseif ($type === 'scale4pnt') {
+        $html .= '<input 
+                    type="number" 
+                    name="scores[' . substr($exercise_id, 2) . ']" 
+                    id="' . htmlspecialchars($exercise_id) . '" 
+                    min="0" 
+                    max="4.0" 
+                    step="0.1" 
+                    placeholder="—"
+                    />';
+    } else {
+        $html .= '<select name="scores[' . substr($exercise_id, 2) . ']" id="' . htmlspecialchars($exercise_id) . '">';
+        $html .= '<option value="">Select Score</option>';
+        foreach ($options as $value => $description) {
+            $html .= '<option value="' . $value . '">' . htmlspecialchars($description) . '</option>';
+        }
+        $html .= '</select>';
     }
-    
-    $html .= '</select>';
+
     $html .= '</div>';
-    
     return $html;
 }
 
+
+
 /**
  * Render the real-time score display widget
- * @return string - HTML for score display
+ * @return string - HTML for score display 
  */
 function renderScoreDisplay() {
     return <<<HTML
@@ -288,7 +390,7 @@ function renderTestSection($title, $icon, $tests) {
     $html .= "  <div class='test-grid'>\n";
     
     foreach ($tests as $test) {
-        $html .= generateTestItem($test[0], $test[1], $test[2]);
+        $html .= generateTestItem($test[0], $test[1], $test[2], $test[3]);
     }
     
     $html .= "  </div>\n";
