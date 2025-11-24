@@ -62,7 +62,7 @@ $patient_name = formatPatientName($patient);
           <!-- Buttons -->
           <div class="button-group">
             <button type="button" class="btn-cancel" onclick="window.history.back()">Cancel</button>
-            <button type="submit" class="btn-calculate">Calculate MSK Score</button>
+            <button type="submit" class="btn-calculate">Calculate MSK Score</button> <!--Take you to calculate-->
           </div>
         </form>
       </div>
