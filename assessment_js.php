@@ -1,11 +1,74 @@
 <?php
+
+
+
 // assessment_js.php
 function getAssessmentJavaScript() {
     return <<<'JS'
     <script>
+    function convertRawToFivePoint(exNum, raw) {
+      if (raw === "" || raw === null || isNaN(raw)) return null;
+      raw = parseFloat(raw);
+
+      // Lookup table mirroring the PHP config
+      // Only the numeric scale100 and scale4pnt tests need conversion
+      const scale100Rules = {
+          2: [50,40,30,0],   // Neck Flexion
+          3: [50,40,30,0],   // Neck Lat Flex
+          4: [80,70,60,45],  // Neck Rotation
+          5: [170,155,140,120], // Shoulder Flex
+          6: [90,80,70,60],  // Shoulder ER
+          7: [90,80,70,60],  // Shoulder IR
+          10: [50,45,35,25], // Trunk Rotation
+          15: [45,40,30,0],  // Hip ER
+          16: [45,40,30,0],  // Hip ER
+          17: [90,70,50,30, 1],  // Grip percentile
+          22: [90,70,50,30,1],  // CMJ
+          23: [90,70,50,30,1],  // SQJ
+          24: [90,80,70,0]     // SL Jump, last two thresholds optional
+      };
+
+      const scale4Rules = {
+          25: [4.0,3.0,2.5,2.0] // IMTP
+      };
+
+      // ------------------
+      // SCALE 100 HANDLING
+      // ------------------
+      if (scale100Rules[exNum]) {
+      const thresholds = scale100Rules[exNum];
+      const [t5, t4, t3, t2, t1] = thresholds;
+
+      if (raw >= t5) return 5;
+      if (raw >= t4) return 4;
+      if (raw >= t3) return 3;
+      if (raw >= t2) return 2;
+      if (t1 !== undefined && raw >= t1) return 1;
+      return 0;
+  }
+
+      // ------------------
+      // SCALE 4 IMTP
+      // ------------------
+      if (scale4Rules[exNum]) {
+          const [t5, t4, t3, t2] = scale4Rules[exNum];
+
+          if (raw >= t5) return 5;
+          if (raw >= t4) return 4;
+          if (raw >= t3) return 3;
+          if (raw >= t2) return 2;
+          return 1;
+      }
+
+      if (raw <= 5) {//would be dropdown
+          return parseInt(raw);
+      }
+    } 
+
+
     // Real-time score calculation
     const form = document.getElementById('msk-form');
-    const allSelects = form.querySelectorAll('select[name^="scores"]');
+    const allSelects = form.querySelectorAll('[name^="scores"]');
     const totalTests = 25;
 
     const categories = {
@@ -25,8 +88,10 @@ function getAssessmentJavaScript() {
       
       allSelects.forEach(select => {
         const exerciseNum = parseInt(select.name.match(/\d+/)[0]);
-        const value = parseInt(select.value) || 0;
-        
+        //const value = parseInt(select.value) || 0; // this, previously, took value of the select and either passed in that or, if empty, returned a 0 as the score
+        const value = convertRawToFivePoint(exerciseNum, parseFloat(select.value));
+
+
         if (select.value !== '') {
           completedTests++;
           totalScore += value;
@@ -35,17 +100,14 @@ function getAssessmentJavaScript() {
           if (exerciseNum >= categories.movement.start && exerciseNum <= categories.movement.end) {
             categoryScores.movement.score += value;
             categoryScores.movement.completed++;
-          } 
-          else if (exerciseNum >= categories.gripStrength.start && exerciseNum <= categories.gripStrength.end) {
+          } else if (exerciseNum >= categories.gripStrength.start && exerciseNum <= categories.gripStrength.end) {
             categoryScores.gripStrength.score += value;
             categoryScores.gripStrength.completed++;
-          } 
-          else if (exerciseNum >= categories.balanceAndPower.start && exerciseNum <= categories.balanceAndPower.end) {
+          } else if (exerciseNum >= categories.balanceAndPower.start && exerciseNum <= categories.balanceAndPower.end) {
             categoryScores.balanceAndPower.score += value;
             categoryScores.balanceAndPower.completed++;
           }
-        } 
-        else {
+        } else {
           select.classList.remove('filled');
         }
       });

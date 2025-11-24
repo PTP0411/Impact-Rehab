@@ -896,6 +896,10 @@ input[type="number"]:focus {
   transition: all 0.3s ease;
 }
 
+.score-red { background-color: #f57c00; /* orangey red */ } 
+.score-yellow { background-color: #fbc02d; /* yellow */ color: #000; /* better contrast */ } 
+.score-green { background-color: #388e3c; /* green */ }
+
 .score-item:hover {
   background: var(--report-indigo-light);
 }
