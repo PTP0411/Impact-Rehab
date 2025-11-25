@@ -48,15 +48,14 @@ function getSessionData($db, $session_id) {
     $query = "
         SELECT 
             s.*, 
-            u.first_name, 
-            u.last_name, 
+            p.fname, 
+            p.lname, 
             p.dob_enc, 
             p.dob_iv,
             s.doctor_comments_enc,
             s.doctor_comments_iv
         FROM sessions s
         JOIN patients p ON s.pid = p.pid
-        JOIN users u ON p.pid = u.uid
         WHERE s.sid = :sid
     ";
 
