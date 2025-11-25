@@ -174,41 +174,46 @@ function displayPatients($patients) {
         echo '<h3>No Patients</h3>';
         echo '<p>Ask an admin to assign you a patient.</p>';
         echo '</div>';
-    } else {
-        foreach ($patients as $patient) {
-            echo '<div class="patient-card">';
-            echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
-            echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
-            echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
-            echo "<button class='bPatient' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
-            echo "<button class='bPatient' onclick=\"window.location.href='assessment_form.php?pid={$patient['pid']}'\">Start MSK Assessment</button>";
-            echo '</div>';
-        }
-    }
+      } 
+      else {
+          foreach ($patients as $patient) {
+              $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
+              $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
+              echo '<div class="patient-card">';
+              echo '<h3>' . htmlspecialchars($patient['fname'].' '.$patient['lname']) . '</h3>';
+              echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
+              echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
+              echo "<button class='bPatient' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
+              echo "<button class=bPatient onclick=\"window.location.href='assessment_form.php?pid={$patient['pid']}'\">Start MSK Assessment</button>";
+              echo '</div>';
+          }
+      }
 }
 
 function displayAdminPatients($patients) {
     if (count($patients) === 0) {
-        echo '<div class="no-patients-card">';
-        echo '<h3>No Patients Found</h3>';
-        echo '</div>';
-    } else {
-        foreach ($patients as $patient) {
-            echo '<div class="patient-card">';
-            echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
-            echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
-            echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
+            echo '<div class="no-patients-card">';
+            echo '<h3>No Patients Found</h3>';
+            echo '</div>';
+          } else {
+            foreach ($patients as $patient) {
+              $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
+              $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
+              echo '<div class="patient-card">';
+              echo '<h3>' . htmlspecialchars($patient['fname']. ' ' .$patient['lname']) . '</h3>';
+              echo '<p>DOB: ' . htmlspecialchars($patient['dob'] ?? '') . '</p>';
+              echo '<p>Note: ' . htmlspecialchars($patient['note'] ?? '') . '</p>';
 
-            $doctorName = $patient['doctor_fname'] && $patient['doctor_lname'] 
+              $doctorName = $patient['doctor_fname'] && $patient['doctor_lname']
                 ? htmlspecialchars($patient['doctor_fname'] . ' ' . $patient['doctor_lname'])
                 : 'Unassigned';
-            
-            echo '<p>Assigned Doctor: ' . $doctorName . '</p>';
-            echo "<button onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
-            echo "<button onclick=\"window.location.href='reassignPatient.php?pid={$patient['pid']}'\">Reassign Patient</button>";
-            echo '</div>';
-        }
-    }
+
+              echo '<p>Assigned Doctor: ' . $doctorName . '</p>';
+              echo "<button onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
+              echo "<button onclick=\"window.location.href='reassignPatient.php?pid={$patient['pid']}'\">Reassign Patient</button>";
+              echo '</div>';
+            }
+          }
 }
 
 

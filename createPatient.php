@@ -22,50 +22,43 @@ if (!$admin) {
 $doctors = $db->query("
     SELECT DISTINCT u.uid, u.first_name, u.last_name
     FROM users u
-    INNER JOIN patients p ON u.uid = p.did
+    INNER JOIN doctors d ON u.uid = d.did
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 $success = $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $name = trim($_POST['name'] ?? '');
+  $fname = trim($_POST['fname'] ?? '');
+  $lname = trim($_POST['lname'] ?? '');
+  $mail = trim($_POST['mail'] ?? '');
   $dob = trim($_POST['dob'] ?? '');
   $did = intval($_POST['did'] ?? 0);
   $note = trim($_POST['note'] ?? '');
 
-  if ($name && $dob && $did) {
+  if ($fname && $dob && $did) {
       try {
-          //Create user for ID purposes only (prolly changing this later tho)
-          $stmt = $db->prepare("
-              INSERT INTO users (username, password, first_name, last_name, email, created_at)
-              VALUES (?, ?, ?, ?, ?, NOW())
-          ");
-          $stmt->execute([$name, $name, $name, $name, $name]);
-
-          $newUid = $db->lastInsertId(); //This will be used as PID
-
+        
           //insert into patients using that UID
           list($noteEnc, $noteIv) = encryptField($note);
           list($dobEnc, $dobIv)   = encryptField($dob);
           $stmt = $db->prepare("
               INSERT INTO patients (
-                pid, did, name, dob, note, 
+                did, fname, lname, email,
                 dob_enc, dob_iv, note_enc, note_iv, created_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
           ");
           $stmt->execute([
-            $newUid, 
             $did, 
-            $name, 
-            $dob, 
-            $note,
+            $fname, 
+            $lname,
+            $mail,
             $dobEnc,
             $dobIv,
             $noteEnc,
             $noteIv
           ]);
 
-          $success = "Patient '$name' created successfully!";
+          $success = "Patient '$fname' created successfully!";
       } catch (PDOException $e) {
           $error = "Error creating patient: " . $e->getMessage();
       }
@@ -134,8 +127,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form method="POST">
       <label>
-        Name:
-        <input type="text" name="name" required>
+        First Name:
+        <input type="text" name="fname" required>
+      </label>
+
+      <label>
+        Last Name:
+        <input type="text" name="lname" required>
+      </label>
+
+      <label>
+        Email:
+        <input type="email" name="mail">
       </label>
 
       <label>

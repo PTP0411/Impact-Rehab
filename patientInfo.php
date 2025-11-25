@@ -157,7 +157,7 @@ if ($admin) {
   <main class="patient-container">
     <!-- Patient Info -->
     <section class="patient-info">
-    <h2 id="patient-name"><?php echo htmlspecialchars($patient['name']); ?></h2>
+    <h2 id="patient-name"><?php echo htmlspecialchars($patient['fname']. ' ' . $patient['lname']); ?></h2>
     <?php 
     if (!empty($patient['dob_enc']) && !empty($patient['dob_iv'])) {
       $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);

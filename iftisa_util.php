@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('America/New_York');
 // ==================== LOGIN FUNCTIONS ====================
 
 function genLoginForm() {
@@ -199,12 +199,11 @@ function getPatientInfo($db, $patient_id) {
 
     $query = "
         SELECT 
-            u.first_name,
-            u.last_name,
+            p.fname,
+            p.lname,
             p.dob_enc,
             p.dob_iv
         FROM patients p
-        JOIN users u ON p.pid = u.uid
         WHERE p.pid = :pid
     ";
 
@@ -234,7 +233,7 @@ function getPatientInfo($db, $patient_id) {
  * @return string - Full name
  */
 function formatPatientName($patient) {
-    return $patient['first_name'] . ' ' . $patient['last_name'];
+    return $patient['fname'] . ' ' . $patient['lname'];
 }
 
 /**

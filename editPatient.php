@@ -39,19 +39,19 @@ if (!$patient) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim($_POST['name']);
+    $fname = trim($_POST['fname']);
+    $lname = trim($_POST['lname']);
     $dob = trim($_POST['dob']);
     $note = trim($_POST['note']);
 
-    if (empty($name) || empty($dob)) {
+    if (empty($fname) || empty($dob)) {
         $error = "Name and date of birth are required.";
     } else {
         list($dobEnc, $dobIv) = encryptField($dob);
         list($noteEnc, $noteIv) = encryptField($note);
         $sql = "UPDATE patients 
-                SET name = ?, 
-                dob = ?, 
-                note = ? ,
+                SET fname = ?, 
+                lname = ?,
                 dob_enc = ?, 
                 dob_iv = ?, 
                 note_enc = ?, 
@@ -59,9 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 WHERE pid = ?";
         $update = $db->prepare($sql);
         $update->execute([
-          $name, 
-          $dob, 
-          $note,
+          $fname, 
+          $lname,
           $dobEnc,
           $dobIv,
           $noteEnc,
@@ -137,16 +136,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form method="POST">
-      <label for="name">Full Name:</label>
-      <input type="text" id="name" name="name" 
-             value="<?php echo htmlspecialchars($patient['name']); ?>" required>
+      <label for="fname">First Name:</label>
+      <input type="text" id="name" name="fname" 
+             value="<?php echo htmlspecialchars($patient['fname']); ?>" required>
+      
+      <label for="lname">Last Name:</label>
+      <input type="text" id="name" name="lname" 
+             value="<?php echo htmlspecialchars($patient['lname']); ?>" required>
 
       <label for="dob">Date of Birth (YYYY-MM-DD):</label>
+      <?php      
+        $decryptedDob  = decryptField($patient['dob_enc'],  $patient['dob_iv']);
+        $decryptedNote = decryptField($patient['note_enc'], $patient['note_iv']);
+      ?>
       <input type="text" id="dob" name="dob" 
-             value="<?php echo htmlspecialchars($patient['dob']); ?>" required>
+             value="<?php echo htmlspecialchars($decryptedDob); ?>" required>
 
       <label for="note">Notes:</label>
-      <textarea id="note" name="note"><?php echo htmlspecialchars($patient['note']); ?></textarea>
+      <textarea id="note" name="note"><?php echo htmlspecialchars($decryptedNote); ?></textarea>
 
       <div class="form-buttons">
         <button type="submit" class="btn-primary">Save Changes</button>

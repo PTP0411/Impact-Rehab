@@ -26,7 +26,7 @@ if ($pid <= 0) {
 }
 
 // Fetch patient details
-$stmt = $db->prepare("SELECT name, did FROM patients WHERE pid = ?");
+$stmt = $db->prepare("SELECT fname, lname,did FROM patients WHERE pid = ?");
 $stmt->execute([$pid]);
 $patient = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -71,7 +71,7 @@ $doctors = $db->query("
 </head>
 <body>
   <header>
-    <h1>Reassign Doctor for <?php echo htmlspecialchars($patient['name']); ?></h1>
+    <h1>Reassign Doctor for <?php echo htmlspecialchars($patient['fname']. ' ' . $patient['lname']); ?></h1>
     <button id="back-btn" onclick="window.location.href='patientInfo.php?pid=<?php echo $pid; ?>'">← Back to Patient</button>
   </header>
 

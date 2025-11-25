@@ -221,17 +221,17 @@ $balanceAndPowerAvg = calculateCategoryAverage($balanceAndPowerScores);
       <h3>🏃 Movement Assessment</h3>
       <div class="score-grid">
         <?php foreach ($movementScores as $item): 
-          $score = (int)$item['score']; 
-          if ($score <= 2) { 
+          $fivePoint = convertRawToFivePoint($item['eid'], $item['score']);
+          if ($fivePoint <= 2) { 
             $colorClass = 'score-red'; 
           } 
-          else if ($score > 2 && $score < 4) {
+          else if ($fivePoint > 2 && $fivePoint < 4) {
             $colorClass = 'score-yellow'; 
           } 
           else { $colorClass = 'score-green'; 
           } 
           
-          $fivePoint = convertRawToFivePoint($item['eid'], $item['score']) ?>
+           ?>
           <div class="score-item <?php echo $colorClass; ?>">            
             <span class="name"><?php echo htmlspecialchars($item['name']); ?></span>
             <span class="value"><?php echo $fivePoint; ?>/5 (<?php echo $item['score']; ?>)</span>
