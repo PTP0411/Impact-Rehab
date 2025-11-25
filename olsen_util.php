@@ -247,7 +247,8 @@ function getPatientsForDoctor($db, $uid, $searchTerm = '', $searchType = 'name')
         }
 
         // Default: name
-        return strpos(strtolower($p['name']), $searchTerm) !== false;
+        $fullName = strtolower(($p['fname'] ?? '') . ' ' . ($p['lname'] ?? ''));
+        return strpos($fullName, $searchTerm) !== false;
     });
 
     return array_values($filtered);
@@ -298,6 +299,7 @@ function getPatientsForAdmin($db, $searchTerm = '', $searchType = 'name') {
 
     return array_values($filtered);
 }
+
 
 
 
