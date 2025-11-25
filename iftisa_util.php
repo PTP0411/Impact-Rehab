@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('America/New_York');
 // ==================== LOGIN FUNCTIONS ====================
 
 function genLoginForm() {
@@ -14,33 +14,6 @@ function genLoginForm() {
   <INPUT type='submit' value='Login' />
 </FORM>
 <?php
-}
-
-function processLogin($db, $formData) {
-    $username = isset($formData['username']) ? trim($formData['username']) : '';
-    $password = isset($formData['password']) ? $formData['password'] : '';
-    
-    $query = 'SELECT uid, first_name, last_name, email FROM users WHERE username = :username AND password = :password';
-    
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':username', $username, PDO::PARAM_STR);
-    $stmt->bindParam(':password', $password, PDO::PARAM_STR);
-    $stmt->execute();
-    
-    if ($stmt->rowCount() == 1) {
-        $row = $stmt->fetch();
-        $_SESSION['uid'] = $row['uid'];
-        $_SESSION['uname'] = $username;
-        $_SESSION['fullname'] = $row['first_name'] . ' ' . $row['last_name'];
-        $_SESSION['email'] = $row['email'];
-        $_SESSION["valid"] = true;
-        
-        header('Location: doctor.php');
-        exit();
-    }
-    else {
-        echo "<p style='color: red; text-align: center; margin-top: 1rem;'>✗ Login failed. Invalid username or password.</p>";
-    }
 }
 
 // ==================== MSK ASSESSMENT FUNCTIONS ====================
@@ -69,17 +42,48 @@ function calculateCategoryAverage($scores) {
  * @return array|false - Session data or false if not found
  */
 function getSessionData($db, $session_id) {
-    $query = "SELECT s.*, u.first_name, u.last_name, u.dob 
-              FROM sessions s 
-              JOIN patients p ON s.pid = p.pid 
-              JOIN users u ON p.pid = u.uid 
-              WHERE s.sid = :sid";
-    
+    include_once('config_secret.php');
+    include_once('security_util.php');
+
+    $query = "
+        SELECT 
+            s.*, 
+            u.first_name, 
+            u.last_name, 
+            p.dob_enc, 
+            p.dob_iv,
+            s.doctor_comments_enc,
+            s.doctor_comments_iv
+        FROM sessions s
+        JOIN patients p ON s.pid = p.pid
+        JOIN users u ON p.pid = u.uid
+        WHERE s.sid = :sid
+    ";
+
     $stmt = $db->prepare($query);
     $stmt->bindParam(':sid', $session_id, PDO::PARAM_INT);
     $stmt->execute();
-    
-    return $stmt->fetch();
+
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) return null;
+
+    //Decrypt DOB
+    if (!empty($row['dob_enc']) && !empty($row['dob_iv'])) {
+        $dobDecrypted = decryptField($row['dob_enc'], $row['dob_iv']);
+        if (!empty($dobDecrypted)) {
+            $row['dob'] = $dobDecrypted;
+        }
+    }
+
+    //Decrypt doctor comments
+    if (!empty($row['doctor_comments_enc']) && !empty($row['doctor_comments_iv'])) {
+        $commentsDecrypted = decryptField($row['doctor_comments_enc'], $row['doctor_comments_iv']);
+        if (!empty($commentsDecrypted)) {
+            $row['doctor_comments'] = $commentsDecrypted;
+        }
+    }
+
+    return $row;
 }
 
 /**
@@ -190,16 +194,37 @@ function convertRawToFivePoint($eid, $raw) {//-Matt O. was here
  * @return array|false - Patient data or false if not found
  */
 function getPatientInfo($db, $patient_id) {
-    $query = "SELECT u.first_name, u.last_name, u.dob 
-              FROM patients p 
-              JOIN users u ON p.pid = u.uid 
-              WHERE p.pid = :pid";
-    
+    include_once 'config_secret.php';
+    include_once 'security_util.php';
+
+    $query = "
+        SELECT 
+            p.fname,
+            p.lname,
+            p.dob_enc,
+            p.dob_iv
+        FROM patients p
+        WHERE p.pid = :pid
+    ";
+
     $stmt = $db->prepare($query);
     $stmt->bindParam(':pid', $patient_id, PDO::PARAM_INT);
     $stmt->execute();
     
-    return $stmt->fetch();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$result) {
+        return null;
+    }
+
+    // Decrypt DOB
+    if (!empty($result['dob_enc']) && !empty($result['dob_iv'])) {
+        $result['dob'] = decryptField($result['dob_enc'], $result['dob_iv']);
+    } else {
+        $result['dob'] = null; // or fallback
+    }
+
+    return $result;
 }
 
 /**
@@ -208,7 +233,7 @@ function getPatientInfo($db, $patient_id) {
  * @return string - Full name
  */
 function formatPatientName($patient) {
-    return $patient['first_name'] . ' ' . $patient['last_name'];
+    return $patient['fname'] . ' ' . $patient['lname'];
 }
 
 /**
@@ -383,10 +408,21 @@ function renderTestSection($title, $icon, $tests) {
  * @return bool - True on success, false on failure
  */
 function saveDoctorComments($db, $session_id, $comments) {
+
+    include_once("config_secret.php");
+    include_once("security_util.php");
+    list($enc, $iv) = encryptField($comments);
+
     try {
-        $query = "UPDATE sessions SET doctor_comments = :comments WHERE sid = :sid";
+        $query = "
+        UPDATE sessions 
+        SET doctor_comments_enc = :enc,
+        doctor_comments_iv = :iv
+        WHERE sid = :sid
+        ";
         $stmt = $db->prepare($query);
-        $stmt->bindParam(':comments', $comments, PDO::PARAM_STR);
+        $stmt->bindParam(':enc', $enc, PDO::PARAM_STR);
+        $stmt->bindParam(':iv', $iv, PDO::PARAM_STR);
         $stmt->bindParam(':sid', $session_id, PDO::PARAM_INT);
         
         return $stmt->execute();

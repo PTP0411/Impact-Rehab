@@ -73,15 +73,18 @@ function deleteDoctor($db, $did, $curr_uid) {
 function addDoctor($db, $data) {
     try {
         $username = $data['username'];
-        $password = $data['password'];
+        $rawPassword = $data['password'];
         $first = $data['first_name'];
         $last = $data['last_name'];
         $email = $data['email'];
 
+        // hash
+        $hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
+
         // Insert into users
         $stmt = $db->prepare("INSERT INTO users (username, password, first_name, last_name, email) 
                               VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$username, $password, $first, $last, $email]);
+        $stmt->execute([$username, $hashedPassword, $first, $last, $email]);
 
         $uid = $db->lastInsertId();
 

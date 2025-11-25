@@ -102,26 +102,7 @@ $admin = isAdmin($db, $uid);
       $searchType = isset($_GET['search_type']) ? $_GET['search_type'] : 'name'; // Default to name
       $patients = getPatientsForDoctor($db, $uid, $searchTerm, $searchType);
 
-
-      if (count($patients) === 0) {
-        echo '<div class="no-patients-card">';
-        echo '<h3>No Patients</h3>';
-        echo '<p>Ask an admin to assign you a patient.</p>';
-        echo '</div>';
-      } 
-      else {
-          foreach ($patients as $patient) {
-              $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
-              $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
-              echo '<div class="patient-card">';
-              echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
-              echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
-              echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
-              echo "<button class='bPatient' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
-              echo "<button class=bPatient onclick=\"window.location.href='assessment_form.php?pid={$patient['pid']}'\">Start MSK Assessment</button>";
-              echo '</div>';
-          }
-      }
+      displayPatients($patients);
       ?>
     </div>
 
@@ -233,7 +214,7 @@ $admin = isAdmin($db, $uid);
                     $adminSearchWildcard = '%' . $adminSearchTerm . '%';
                     $stmt = $db->prepare("
                         $queryBase
-                        WHERE patients.name LIKE ?
+                        WHERE patients.fname LIKE ? OR patients.lname LIKE ?
                     ");
                     $stmt->execute([$adminSearchWildcard]);
                     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -255,46 +236,11 @@ $admin = isAdmin($db, $uid);
               $stmt = $db->prepare($queryBase);
               $stmt->execute();
               $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-              // Decrypt DOB
-              foreach ($rows as &$row) {
-                  if (!empty($row['dob_enc']) && !empty($row['dob_iv'])) {
-                      $row['dob'] = decryptField($row['dob_enc'], $row['dob_iv']);
-                  } else {
-                      $row['dob'] = '';
-                  }
-              }
-
               $results = $rows;
           }
 
           $allPatients = $results;
-
-
-          if (count($allPatients) === 0) {
-            echo '<div class="no-patients-card">';
-            echo '<h3>No Patients Found</h3>';
-            echo '</div>';
-          } else {
-            foreach ($allPatients as $patient) {
-              $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
-              $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
-              echo '<div class="patient-card">';
-              echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
-              echo '<p>DOB: ' . htmlspecialchars($patient['dob'] ?? '') . '</p>';
-              echo '<p>Note: ' . htmlspecialchars($patient['note'] ?? '') . '</p>';
-
-              $doctorName = $patient['doctor_fname'] && $patient['doctor_lname']
-                ? htmlspecialchars($patient['doctor_fname'] . ' ' . $patient['doctor_lname'])
-                : 'Unassigned';
-
-              echo '<p>Assigned Doctor: ' . $doctorName . '</p>';
-
-              echo "<button onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
-              echo "<button onclick=\"window.location.href='reassignPatient.php?pid={$patient['pid']}'\">Reassign Patient</button>";
-              echo '</div>';
-            }
-          }
+          displayAdminPatients($allPatients);
         ?>
       </section>
     <?php endif; ?>

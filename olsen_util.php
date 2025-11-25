@@ -1,4 +1,8 @@
 <?php
+
+include_once('config_secret.php');
+include_once('security_util.php');
+
 function handlePasswordReset($db, $formData) {
     $username = trim($formData['username']);
 
@@ -57,7 +61,7 @@ function handlePasswordReset($db, $formData) {
     }
 }
 
-function oldprocessLogin($db, $formData) {
+function processLogin($db, $formData) {
     $username = isset($formData['username']) ? trim($formData['username']) : '';
     $password = isset($formData['password']) ? $formData['password'] : '';
 
@@ -81,7 +85,6 @@ function oldprocessLogin($db, $formData) {
             $_SESSION['email'] = $row['email'];
             $_SESSION["valid"] = true;
             
-            echo "<p style='color: green; text-align: center; margin-top: 1rem;'>✓ Login successful! Redirecting...</p>";
             header('refresh:1;url=doctor.php');
             exit();
         } else {
@@ -171,118 +174,129 @@ function displayPatients($patients) {
         echo '<h3>No Patients</h3>';
         echo '<p>Ask an admin to assign you a patient.</p>';
         echo '</div>';
-    } else {
-        foreach ($patients as $patient) {
-            echo '<div class="patient-card">';
-            echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
-            echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
-            echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
-            echo "<button class='bPatient' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
-            echo "<button class='bPatient' onclick=\"window.location.href='assessment_form.php?pid={$patient['pid']}'\">Start MSK Assessment</button>";
-            echo '</div>';
-        }
-    }
+      } 
+      else {
+          foreach ($patients as $patient) {
+              $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
+              $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
+              echo '<div class="patient-card">';
+              echo '<h3>' . htmlspecialchars($patient['fname'].' '.$patient['lname']) . '</h3>';
+              echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
+              echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
+              echo "<button class='bPatient' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
+              echo "<button class=bPatient onclick=\"window.location.href='assessment_form.php?pid={$patient['pid']}'\">Start MSK Assessment</button>";
+              echo '</div>';
+          }
+      }
 }
 
 function displayAdminPatients($patients) {
     if (count($patients) === 0) {
-        echo '<div class="no-patients-card">';
-        echo '<h3>No Patients Found</h3>';
-        echo '</div>';
-    } else {
-        foreach ($patients as $patient) {
-            echo '<div class="patient-card">';
-            echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
-            echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
-            echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
+            echo '<div class="no-patients-card">';
+            echo '<h3>No Patients Found</h3>';
+            echo '</div>';
+          } else {
+            foreach ($patients as $patient) {
+              $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
+              $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
+              echo '<div class="patient-card">';
+              echo '<h3>' . htmlspecialchars($patient['fname']. ' ' .$patient['lname']) . '</h3>';
+              echo '<p>DOB: ' . htmlspecialchars($patient['dob'] ?? '') . '</p>';
+              echo '<p>Note: ' . htmlspecialchars($patient['note'] ?? '') . '</p>';
 
-            $doctorName = $patient['doctor_fname'] && $patient['doctor_lname'] 
+              $doctorName = $patient['doctor_fname'] && $patient['doctor_lname']
                 ? htmlspecialchars($patient['doctor_fname'] . ' ' . $patient['doctor_lname'])
                 : 'Unassigned';
-            
-            echo '<p>Assigned Doctor: ' . $doctorName . '</p>';
-            echo "<button onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
-            echo "<button onclick=\"window.location.href='reassignPatient.php?pid={$patient['pid']}'\">Reassign Patient</button>";
-            echo '</div>';
-        }
-    }
+
+              echo '<p>Assigned Doctor: ' . $doctorName . '</p>';
+              echo "<button onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
+              echo "<button onclick=\"window.location.href='reassignPatient.php?pid={$patient['pid']}'\">Reassign Patient</button>";
+              echo '</div>';
+            }
+          }
 }
 
 
 
-function getPatientsForDoctor($db, $uid, $searchTerm = '', $searchType = 'name') {
-    if (!empty($searchTerm)) {
-        $searchTermWildcard = '%' . $searchTerm . '%';
+function getPatientsForDoctor($db, $uid, $searchTerm = '', $searchType = 'name') 
+{
+    // 1. Fetch all patients for this doctor (encrypted DOB included)
+    $stmt = $db->prepare("SELECT * FROM patients WHERE did = ?");
+    $stmt->execute([$uid]);
+    $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 2. Decrypt DOB for each patient
+    foreach ($patients as &$p) {
+        if (!empty($p['dob_enc']) && !empty($p['dob_iv'])) {
+            $p['dob'] = decryptField($p['dob_enc'], $p['dob_iv']);
+        }
+    }
+
+    // 3. If no search term → return all
+    if (empty($searchTerm)) {
+        return $patients;
+    }
+
+    $searchTerm = strtolower($searchTerm);
+
+    // 4. Filter based on search type
+    $filtered = array_filter($patients, function($p) use ($searchTerm, $searchType) {
 
         if ($searchType === 'dob') {
-            // Optional: convert search to standard date format if needed
-            $stmt = $db->prepare("SELECT * FROM patients WHERE did = ? AND dob LIKE ?");
-        } else {
-            // Default: search by name
-            $stmt = $db->prepare("SELECT * FROM patients WHERE did = ? AND name LIKE ?");
+            return strpos(strtolower($p['dob']), $searchTerm) !== false;
         }
 
-        $stmt->execute([$uid, $searchTermWildcard]);
-    } else {
-        $stmt = $db->prepare("SELECT * FROM patients WHERE did = ?");
-        $stmt->execute([$uid]);
-    }
+        // Default: name
+        return strpos(strtolower($p['name']), $searchTerm) !== false;
+    });
 
-
-    // Return the results
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return array_values($filtered);
 }
 
-function getPatientsForAdmin($db, $searchTerm = '', $searchType = 'name') {
-    // Set search term with wildcards
-    $searchTermWildcard = !empty($searchTerm) ? '%' . $searchTerm . '%' : '';
 
-    // Prepare query based on the search type
-    if (!empty($searchTerm)) {
+function getPatientsForAdmin($db, $searchTerm = '', $searchType = 'name') {
+ // 1. Fetch all patients with doctor info
+    $stmt = $db->prepare("
+        SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
+        FROM patients
+        LEFT JOIN users ON patients.did = users.uid
+    ");
+    $stmt->execute();
+    $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 2. Decrypt DOB
+    foreach ($patients as &$p) {
+        if (!empty($p['dob_enc']) && !empty($p['dob_iv'])) {
+            $p['dob'] = decryptField($p['dob_enc'], $p['dob_iv']);
+        }
+    }
+
+    // 3. If no search → return all
+    if (empty($searchTerm)) {
+        return $patients;
+    }
+
+    $searchTerm = strtolower($searchTerm);
+
+    // 4. Filter by search type
+    $filtered = array_filter($patients, function($p) use ($searchTerm, $searchType) {
+
         switch ($searchType) {
+
             case 'dob':
-                $stmt = $db->prepare("
-                    SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
-                    FROM patients
-                    LEFT JOIN users ON patients.did = users.uid
-                    WHERE patients.dob LIKE ?
-                ");
-                $stmt->execute([$searchTermWildcard]);
-                break;
+                return strpos(strtolower($p['dob']), $searchTerm) !== false;
 
             case 'doctor':
-                $stmt = $db->prepare("
-                    SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
-                    FROM patients
-                    LEFT JOIN users ON patients.did = users.uid
-                    WHERE users.first_name LIKE ? OR users.last_name LIKE ?
-                ");
-                $stmt->execute([$searchTermWildcard, $searchTermWildcard]);
-                break;
+                return strpos(strtolower($p['doctor_fname']), $searchTerm) !== false ||
+                       strpos(strtolower($p['doctor_lname']), $searchTerm) !== false;
 
             case 'name':
             default:
-                $stmt = $db->prepare("
-                    SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
-                    FROM patients
-                    LEFT JOIN users ON patients.did = users.uid
-                    WHERE patients.name LIKE ?
-                ");
-                $stmt->execute([$searchTermWildcard]);
-                break;
+                return strpos(strtolower($p['name']), $searchTerm) !== false;
         }
-    } else {
-        // No search term - get all patients
-        $stmt = $db->prepare("
-            SELECT patients.*, users.first_name AS doctor_fname, users.last_name AS doctor_lname
-            FROM patients
-            LEFT JOIN users ON patients.did = users.uid
-        ");
-        $stmt->execute();
-    }
+    });
 
-    // Return the results
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return array_values($filtered);
 }
 
 
