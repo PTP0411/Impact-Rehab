@@ -14,6 +14,9 @@ if (isset($_GET['logout'])) {
 include_once('connect.php');
 include_once('philipUtil.php');
 include_once('iftisa_util.php');
+include_once('config_secret.php');
+include_once('security_util.php');
+include_once('olsen_util.php');
 
 
 // Ensure user is logged in
@@ -97,25 +100,7 @@ $admin = isAdmin($db, $uid);
       // Fetch patients for this doctor
       $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
       $searchType = isset($_GET['search_type']) ? $_GET['search_type'] : 'name'; // Default to name
-
-      if (!empty($searchTerm)) {
-          $searchTermWildcard = '%' . $searchTerm . '%';
-
-          if ($searchType === 'dob') {
-              // Optional: convert search to standard date format if needed
-              $stmt = $db->prepare("SELECT * FROM patients WHERE did = ? AND dob LIKE ?");
-          } else {
-              // Default: search by name
-              $stmt = $db->prepare("SELECT * FROM patients WHERE did = ? AND name LIKE ?");
-          }
-
-          $stmt->execute([$uid, $searchTermWildcard]);
-      } else {
-          $stmt = $db->prepare("SELECT * FROM patients WHERE did = ?");
-          $stmt->execute([$uid]);
-      }
-
-      $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      $patients = getPatientsForDoctor($db, $uid, $searchTerm, $searchType);
 
 
       if (count($patients) === 0) {
@@ -126,6 +111,8 @@ $admin = isAdmin($db, $uid);
       } 
       else {
           foreach ($patients as $patient) {
+              $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
+              $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
               echo '<div class="patient-card">';
               echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
               echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
@@ -245,10 +232,12 @@ $admin = isAdmin($db, $uid);
             echo '</div>';
           } else {
             foreach ($allPatients as $patient) {
+              $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
+              $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
               echo '<div class="patient-card">';
               echo '<h3>' . htmlspecialchars($patient['name']) . '</h3>';
-              echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
-              echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
+              echo '<p>DOB: ' . htmlspecialchars($patient['dob'] ?? '') . '</p>';
+              echo '<p>Note: ' . htmlspecialchars($patient['note'] ?? '') . '</p>';
 
               $doctorName = $patient['doctor_fname'] && $patient['doctor_lname']
                 ? htmlspecialchars($patient['doctor_fname'] . ' ' . $patient['doctor_lname'])

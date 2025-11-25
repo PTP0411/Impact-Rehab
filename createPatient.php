@@ -1,16 +1,14 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 include_once('connect.php');
 include_once('philipUtil.php');
+include_once('config_secret.php');
+include_once('security_util.php');
 
-$hardcoded_did = 5;
-$_SESSION['uid'] = $hardcoded_did;
 
-if (!isset($_SESSION['uid'])) {
-    $_SESSION['uid'] = 5;
+if (!isset($_SESSION['uid']) || !isAdmin($db, $_SESSION['uid'])) {
+    header("Location: login.php");
+    exit();
 }
 
 $uid = $_SESSION['uid'];
@@ -47,11 +45,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $newUid = $db->lastInsertId(); //This will be used as PID
 
           //insert into patients using that UID
+          list($noteEnc, $noteIv) = encryptField($note);
+          list($dobEnc, $dobIv)   = encryptField($dob);
           $stmt = $db->prepare("
-              INSERT INTO patients (pid, did, name, dob, created_at, note)
-              VALUES (?, ?, ?, ?, NOW(), ?)
+              INSERT INTO patients (
+                pid, did, name, dob, note, 
+                dob_enc, dob_iv, note_enc, note_iv, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
           ");
-          $stmt->execute([$newUid, $did, $name, $dob, $note]);
+          $stmt->execute([
+            $newUid, 
+            $did, 
+            $name, 
+            $dob, 
+            $note,
+            $dobEnc,
+            $dobIv,
+            $noteEnc,
+            $noteIv
+          ]);
 
           $success = "Patient '$name' created successfully!";
       } catch (PDOException $e) {
@@ -72,25 +84,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Create New Patient</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f4f4f4;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
     h1 {
       margin: 0;
     }
     form {
-      background: white;
-      padding: 20px;
+      max-width: 600px;
+      margin: 30px auto;
+      background: #f9f9f9;
+      padding: 20px 30px;
       border-radius: 8px;
-      max-width: 500px;
-      margin-top: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     label {
       display: block;
@@ -104,14 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    button {
-      background-color:rgb(24, 139, 39);
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    } <!-- Optional if using shared CSS -->
     .msg {
       padding: 10px;
       margin-bottom: 20px;
@@ -119,14 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     .success { background-color: #d4edda; color: #155724; }
     .error { background-color: #f8d7da; color: #721c24; }
-    #back-btn {
-      background: #ccc;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 4px;
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
@@ -173,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea name="note" rows="3"></textarea>
       </label>
 
-      <button type="submit">Create Patient</button>
+      <button type="submit" class="btn-primary">Create Patient</button>
     </form>
   </main>
 

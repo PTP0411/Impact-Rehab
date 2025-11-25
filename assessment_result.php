@@ -94,7 +94,7 @@ $balanceAndPowerAvg = calculateCategoryAverage($balanceAndPowerScores);
   <header>
     <h1>MSK Assessment Results</h1>
     <div class="header-buttons">
-      <button id="back-to-form-btn" onclick="window.location.href='assessment_form.php?pid=<?php echo $session['pid']; ?>'">← Back to Form</button>
+      <!-- <button id="back-to-form-btn" onclick="window.location.href='assessment_form.php?pid=<?php echo $session['pid']; ?>'">← Back to Form</button> -->
       <button id="back-to-dashboard-btn" onclick="window.location.href='doctor.php'">← Back to Dashboard</button>
     </div>
   </header>

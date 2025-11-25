@@ -13,7 +13,8 @@ if (isset($_GET['logout'])) {
 
 include_once('connect.php');
 include_once('philipUtil.php');
-
+include_once('config_secret.php');
+include_once('security_util.php');
 
 // Ensure user is logged in
 if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
@@ -157,18 +158,27 @@ if ($admin) {
     <!-- Patient Info -->
     <section class="patient-info">
     <h2 id="patient-name"><?php echo htmlspecialchars($patient['name']); ?></h2>
+    <?php 
+    if (!empty($patient['dob_enc']) && !empty($patient['dob_iv'])) {
+      $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
+    }
+    ?>
     <p><strong>Date of Birth:</strong> <?php echo htmlspecialchars($patient['dob']); ?></p>
     <p><strong>Assigned Doctor:</strong> <?php echo htmlspecialchars($doctorName); ?></p>
       
     
 
     <!-- Patient Note -->
+    <h3>Patient Note</h3>
+    <?php 
+    if (!empty($patient['note_enc']) && !empty($patient['note_iv'])) {
+      $patient['note'] = decryptField($patient['note_enc'], $patient['note_iv']);
+    }
+    ?>
     <?php if (!empty($patient['note'])): ?>
-        <h3>Patient Note</h3>
         <p><?php echo nl2br(htmlspecialchars($patient['note'])); ?></p>
 
     <?php else: ?>
-        <h3>Patient Note</h3>
         <p><em>No notes available.</em></p>
     <?php endif; ?>
 

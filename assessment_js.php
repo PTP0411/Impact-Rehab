@@ -147,7 +147,7 @@ function getAssessmentJavaScript() {
       submitBtn.disabled = false;
       
       if (completedTests === 0) {
-        submitBtn.textContent = 'Start Assessment';
+        // submitBtn.textContent = 'Start Assessment';
       } else if (completedTests === totalTests) {
         submitBtn.textContent = 'Submit Complete Assessment';
       } else {

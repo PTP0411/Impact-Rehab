@@ -6,7 +6,8 @@ session_start();
 
 include_once('connect.php');
 include_once('philipUtil.php');
-
+include_once('config_secret.php');
+include_once('security_util.php');
 
 // Ensure user is logged in
 if (!isset($_SESSION['valid']) || $_SESSION['valid'] !== true) {
@@ -45,8 +46,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($name) || empty($dob)) {
         $error = "Name and date of birth are required.";
     } else {
-        $update = $db->prepare("UPDATE patients SET name = ?, dob = ?, note = ? WHERE pid = ?");
-        $update->execute([$name, $dob, $note, $pid]);
+        list($dobEnc, $dobIv) = encryptField($dob);
+        list($noteEnc, $noteIv) = encryptField($note);
+        $sql = "UPDATE patients 
+                SET name = ?, 
+                dob = ?, 
+                note = ? ,
+                dob_enc = ?, 
+                dob_iv = ?, 
+                note_enc = ?, 
+                note_iv = ?
+                WHERE pid = ?";
+        $update = $db->prepare($sql);
+        $update->execute([
+          $name, 
+          $dob, 
+          $note,
+          $dobEnc,
+          $dobIv,
+          $noteEnc,
+          $noteIv, 
+          $pid]);
 
         header("Location: patientInfo.php?pid=$pid");
         exit();
@@ -92,20 +112,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       display: flex;
       justify-content: space-between;
     }
-    .save-btn, .cancel-btn {
+    .btn-primary, .btn-cancel {
       padding: 10px 16px;
       font-size: 16px;
       cursor: pointer;
       border: none;
       border-radius: 5px;
-    }
-    .save-btn {
-      background-color: #7ab92f;
-      color: white;
-    }
-    .cancel-btn {
-      background-color: #ccc;
-      color: black;
     }
     .error {
       color: red;
@@ -137,8 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <textarea id="note" name="note"><?php echo htmlspecialchars($patient['note']); ?></textarea>
 
       <div class="form-buttons">
-        <button type="submit" class="save-btn">Save Changes</button>
-        <button type="button" class="cancel-btn" id="cancel-btn">Cancel</button>
+        <button type="submit" class="btn-primary">Save Changes</button>
+        <button type="button" class="btn-cancel" id="btn-cancel">Cancel</button>
       </div>
     </form>
   </main>
@@ -147,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     document.getElementById("back-btn").addEventListener("click", () => {
       window.location.href = "patientInfo.php?pid=<?php echo $pid; ?>";
     });
-    document.getElementById("cancel-btn").addEventListener("click", () => {
+    document.getElementById("btn-cancel").addEventListener("click", () => {
       window.location.href = "patientInfo.php?pid=<?php echo $pid; ?>";
     });
   </script>

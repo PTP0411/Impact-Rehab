@@ -896,9 +896,9 @@ input[type="number"]:focus {
   transition: all 0.3s ease;
 }
 
-.score-red { background-color: #f57c00; /* orangey red */ } 
-.score-yellow { background-color: #fbc02d; /* yellow */ color: #000; /* better contrast */ } 
-.score-green { background-color: #388e3c; /* green */ }
+.score-red { background-color: #D84315; /* orangey red */ } 
+.score-yellow { background-color: #F9A825; /* yellow */  } 
+.score-green { background-color: #2E7D32; /* green */ }
 
 .score-item:hover {
   background: var(--report-indigo-light);
@@ -906,12 +906,12 @@ input[type="number"]:focus {
 
 .score-item .name {
   font-weight: 600;
-  color: var(--text-dark);
+  color: black;
 }
 
 .score-item .value {
   font-weight: bold;
-  color: var(--report-indigo);
+  color: white;
   font-size: 1.1rem;
 }
 
