@@ -216,7 +216,7 @@ $admin = isAdmin($db, $uid);
                         $queryBase
                         WHERE patients.fname LIKE ? OR patients.lname LIKE ?
                     ");
-                    $stmt->execute([$adminSearchWildcard]);
+                    $stmt->execute([$adminSearchWildcard, $adminSearchWildcard]);
                     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     // Decrypt DOB

@@ -181,9 +181,9 @@ function displayPatients($patients) {
               $patient['dob'] = decryptField($patient['dob_enc'], $patient['dob_iv']);
               echo '<div class="patient-card">';
               echo '<h3>' . htmlspecialchars($patient['fname'].' '.$patient['lname']) . '</h3>';
-              echo '<p>DOB: ' . htmlspecialchars($patient['dob']) . '</p>';
-              echo '<p>Note: ' . htmlspecialchars($patient['note']) . '</p>';
-              echo "<button class='bPatient' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
+              echo '<p>DOB: ' . htmlspecialchars($patient['dob'] ?? '') . '</p>';
+              echo '<p>Note: ' . htmlspecialchars($patient['note'] ?? '') . '</p>';
+              echo "<button class='bPatient' style='margin-right: 100px;' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
               echo "<button class=bPatient onclick=\"window.location.href='assessment_form.php?pid={$patient['pid']}'\">Start MSK Assessment</button>";
               echo '</div>';
           }
@@ -209,7 +209,7 @@ function displayAdminPatients($patients) {
                 : 'Unassigned';
 
               echo '<p>Assigned Doctor: ' . $doctorName . '</p>';
-              echo "<button onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
+              echo "<button style = 'margin-right: 10px;' onclick=\"window.location.href='patientInfo.php?pid={$patient['pid']}'\">View Details</button>";
               echo "<button onclick=\"window.location.href='reassignPatient.php?pid={$patient['pid']}'\">Reassign Patient</button>";
               echo '</div>';
             }
@@ -299,7 +299,6 @@ function getPatientsForAdmin($db, $searchTerm = '', $searchType = 'name') {
 
     return array_values($filtered);
 }
-
 
 
 
